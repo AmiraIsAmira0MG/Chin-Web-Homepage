@@ -13,21 +13,21 @@
       "description": "The architecture and design specification for BTFLY is now published — covering Global Login, node types, auth flow, and the monetisation plan.",
       "tag": "update",
       "date": "2026-03-08T12:00:00Z",
-      "url": "btfly-spec.html"
+      "url": "https://btfly.social/spec"
     },
     {
       "title": "chin web launched",
       "description": "A new Ecosia-powered search page is live under chinberclart.dev — searches the web and plants trees.",
       "tag": "release",
       "date": "2026-03-08T10:00:00Z",
-      "url": "chinweb.html"
+      "url": "https://search.chinberclart.dev"
     },
     {
       "title": "Privacy policy published",
       "description": "A unified privacy policy covering chinberclart.dev, BTFLY, Cloudlight Games, and all future projects is now live.",
       "tag": "update",
       "date": "2026-03-07T18:00:00Z",
-      "url": "privacy.html"
+      "url": "https://chinberclart.dev/privacy"
     },
     {
       "title": "Shockwave — early development",
@@ -40,7 +40,7 @@
       "description": "chinberclart.dev has been rebuilt from scratch with a new design system shared across all Cloudlight projects.",
       "tag": "release",
       "date": "2026-02-20T00:00:00Z",
-      "url": "index.html"
+      "url": "https://chinberclart.dev"
     }
   ]
 }
