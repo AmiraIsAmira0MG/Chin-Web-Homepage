@@ -120,6 +120,7 @@
       width: 100%; max-width: 640px;
       animation: fadeUp 0.5s 0.1s ease both;
       transition: max-width 0.45s cubic-bezier(0.4,0,0.2,1);
+      position: relative;
     }
     main.has-results .search-wrap { max-width: 780px; }
 
@@ -181,7 +182,48 @@
       background: rgba(169,255,203,0.05);
     }
 
-    /* ── BADGE ── */
+    /* ── SUGGESTIONS DROPDOWN ── */
+    .suggestions-dropdown {
+      position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: 16px; overflow: hidden;
+      z-index: 100; display: none;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+      animation: fadeUp 0.15s ease both;
+    }
+    .suggestions-dropdown.open { display: block; }
+
+    .sugg-group-label {
+      font-family: 'Syne', sans-serif; font-size: 0.58rem; font-weight: 700;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted);
+      padding: 0.75rem 1.2rem 0.35rem;
+    }
+    .sugg-item {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.6rem 1.2rem;
+      cursor: none; transition: background 0.15s;
+      text-decoration: none; color: var(--text);
+      border: none; background: none; width: 100%; text-align: left;
+    }
+    .sugg-item:hover, .sugg-item.focused {
+      background: var(--surface2);
+    }
+    .sugg-item:hover .sugg-label, .sugg-item.focused .sugg-label { color: var(--accent-a); }
+    .sugg-icon {
+      font-size: 0.85rem; width: 20px; text-align: center; flex-shrink: 0;
+    }
+    .sugg-label {
+      font-size: 0.82rem; font-weight: 500; color: var(--muted2);
+      transition: color 0.15s; flex: 1;
+    }
+    .sugg-label mark {
+      background: none; color: var(--accent-a); font-weight: 700;
+    }
+    .sugg-type {
+      font-size: 0.6rem; font-family: 'Syne', sans-serif; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
+    }
+    .sugg-divider { height: 1px; background: var(--border); margin: 0.2rem 0; }
     .search-badge {
       margin-top: 3rem;
       display: inline-flex; align-items: center; gap: 0.6rem;
@@ -390,15 +432,10 @@
           <span>Search</span>
         </button>
       </div>
+      <!-- Suggestions dropdown -->
+      <div class="suggestions-dropdown" id="suggestions-dropdown"></div>
     </div>
-
-    <div class="shortcuts">
-      <a class="shortcut-chip" href="#" onclick="setQuery('latest news');doSearch();return false;">📰 News</a>
-      <a class="shortcut-chip" href="#" onclick="setQuery('open source projects');doSearch();return false;">⚙️ Open Source</a>
-      <a class="shortcut-chip" href="#" onclick="setQuery('game development tutorials');doSearch();return false;">🎮 Game Dev</a>
-      <a class="shortcut-chip" href="#" onclick="setQuery('indie dev community');doSearch();return false;">🛠️ Indie Dev</a>
-      <a class="shortcut-chip" href="#" onclick="setQuery('web design inspiration');doSearch();return false;">✦ Design</a>
-    </div>
+    <div class="shortcuts" id="shortcuts-row"></div>
 
     <div class="search-badge">
       <span class="badge-dot"></span>
@@ -599,10 +636,32 @@
     }
 
     // ── KEYBOARD ──
+    let focusedSuggIdx = -1;
+
     inp.addEventListener('keydown', e => {
-      if (e.key === 'Enter') doSearch(0);
-      if (e.key === 'Escape') inp.blur();
+      const items = dropdown.querySelectorAll('.sugg-item');
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        focusedSuggIdx = Math.min(focusedSuggIdx + 1, items.length - 1);
+        items.forEach((el,i) => el.classList.toggle('focused', i === focusedSuggIdx));
+        if (items[focusedSuggIdx]) items[focusedSuggIdx].scrollIntoView({block:'nearest'});
+        return;
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        focusedSuggIdx = Math.max(focusedSuggIdx - 1, -1);
+        items.forEach((el,i) => el.classList.toggle('focused', i === focusedSuggIdx));
+        return;
+      }
+      if (e.key === 'Enter') {
+        if (focusedSuggIdx >= 0 && items[focusedSuggIdx]) {
+          items[focusedSuggIdx].click(); return;
+        }
+        doSearch(0); return;
+      }
+      if (e.key === 'Escape') { closeDropdown(); inp.blur(); }
     });
+
     document.addEventListener('keydown', e => {
       if (e.key === '/' && document.activeElement !== inp) { e.preventDefault(); inp.focus(); }
     });
@@ -611,7 +670,120 @@
     window.addEventListener('DOMContentLoaded', () => {
       const p = new URLSearchParams(window.location.search);
       if (p.get('q')) { inp.value = p.get('q'); doSearch(parseInt(p.get('p')||'0',10)); }
+      loadSuggestions();
       loadNews();
+    });
+
+    // ── SUGGESTIONS ──
+    const dropdown = document.getElementById('suggestions-dropdown');
+    let allSuggestions = [];
+
+    async function loadSuggestions() {
+      try {
+        const res = await fetch('suggestions.json');
+        if (!res.ok) throw 0;
+        const data = await res.json();
+        allSuggestions = data.suggestions || [];
+        renderShortcuts();
+      } catch {
+        // silently skip if no suggestions.json
+      }
+    }
+
+    function renderShortcuts() {
+      // Show "my projects" + "search" groups as homepage chips
+      const row = document.getElementById('shortcuts-row');
+      const show = allSuggestions.filter(g => g.group === 'my projects' || g.group === 'search');
+      const chips = show.flatMap(g => g.items);
+      row.innerHTML = chips.map(item => {
+        if (item.url) {
+          return `<a class="shortcut-chip" href="${esc(item.url)}">${item.icon} ${esc(item.label)}</a>`;
+        }
+        return `<button class="shortcut-chip" onclick="setQuery(${JSON.stringify(item.query)});doSearch();return false;">${item.icon} ${esc(item.label)}</button>`;
+      }).join('');
+      bindHover(row);
+    }
+
+    function openDropdown(filtered) {
+      if (!filtered.length) { closeDropdown(); return; }
+      focusedSuggIdx = -1;
+
+      // Group results by their source group
+      const grouped = {};
+      filtered.forEach(({group, item}) => {
+        if (!grouped[group]) grouped[group] = [];
+        grouped[group].push(item);
+      });
+
+      dropdown.innerHTML = Object.entries(grouped).map(([group, items], gi) => `
+        ${gi > 0 ? '<div class="sugg-divider"></div>' : ''}
+        <div class="sugg-group-label">${group}</div>
+        ${items.map(item => {
+          const typeLabel = item.url ? '↗' : '🔍';
+          const highlighted = highlightMatch(item.label, inp.value.trim());
+          if (item.url) {
+            return `<a class="sugg-item" href="${esc(item.url)}">
+              <span class="sugg-icon">${item.icon}</span>
+              <span class="sugg-label">${highlighted}</span>
+              <span class="sugg-type">${typeLabel}</span>
+            </a>`;
+          }
+          return `<button class="sugg-item" onclick="setQuery(${JSON.stringify(item.query||item.label)});doSearch();">
+            <span class="sugg-icon">${item.icon}</span>
+            <span class="sugg-label">${highlighted}</span>
+            <span class="sugg-type">${typeLabel}</span>
+          </button>`;
+        }).join('')}
+      `).join('');
+
+      dropdown.classList.add('open');
+      bindHover(dropdown);
+    }
+
+    function closeDropdown() {
+      dropdown.classList.remove('open');
+      focusedSuggIdx = -1;
+    }
+
+    function highlightMatch(label, query) {
+      if (!query) return esc(label);
+      const idx = label.toLowerCase().indexOf(query.toLowerCase());
+      if (idx === -1) return esc(label);
+      return esc(label.slice(0, idx)) +
+        `<mark>${esc(label.slice(idx, idx + query.length))}</mark>` +
+        esc(label.slice(idx + query.length));
+    }
+
+    // Filter suggestions as user types
+    inp.addEventListener('input', () => {
+      const q = inp.value.trim();
+      if (!q) { closeDropdown(); return; }
+
+      const results = [];
+      allSuggestions.forEach(group => {
+        group.items.forEach(item => {
+          const searchable = (item.label + ' ' + (item.query||'') + ' ' + (item.url||'')).toLowerCase();
+          if (searchable.includes(q.toLowerCase())) {
+            results.push({ group: group.group, item });
+          }
+        });
+      });
+      openDropdown(results);
+    });
+
+    inp.addEventListener('focus', () => {
+      // Show "my projects" + "popular sites" as default when focused with no query
+      if (!inp.value.trim()) {
+        const defaults = allSuggestions
+          .filter(g => g.group === 'my projects' || g.group === 'popular sites')
+          .flatMap(g => g.items.map(item => ({ group: g.group, item })));
+        openDropdown(defaults);
+      }
+    });
+
+    // Close when clicking outside
+    document.addEventListener('mousedown', e => {
+      if (!dropdown.contains(e.target) && e.target !== inp) closeDropdown();
     });
 
     // ── NEWS FEED ──
