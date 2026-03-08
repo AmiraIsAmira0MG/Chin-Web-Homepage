@@ -395,6 +395,149 @@
     .footer-brave { display: flex; align-items: center; gap: 0.4rem; }
     .brave-dot { width: 5px; height: 5px; border-radius: 50%; background: #ff6000; }
 
+    /* ── HISTORY BUTTON ── */
+    .history-btn {
+      position: fixed; top: 1.2rem; left: 1.2rem; z-index: 300;
+      display: flex; align-items: center; gap: 0.5rem;
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: 100px; padding: 0.45rem 0.9rem 0.45rem 0.7rem;
+      font-family: 'Syne', sans-serif; font-size: 0.72rem; font-weight: 700;
+      color: var(--muted2); cursor: none;
+      transition: border-color 0.2s, color 0.2s, background 0.2s, opacity 0.2s;
+      letter-spacing: 0.02em;
+    }
+    .history-btn:hover { border-color: rgba(169,255,203,0.35); color: var(--accent-a); background: rgba(169,255,203,0.05); }
+    .history-btn.disabled { opacity: 0.3; pointer-events: none; }
+    .history-btn .count-badge {
+      background: var(--accent-a); color: #0a0a0f;
+      border-radius: 100px; font-size: 0.6rem; font-weight: 800;
+      padding: 0.1rem 0.4rem; margin-left: 0.1rem; line-height: 1.4;
+    }
+
+    /* ── HISTORY OVERLAY ── */
+    .history-overlay {
+      position: fixed; inset: 0; z-index: 350;
+      background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .history-overlay.open { opacity: 1; pointer-events: all; }
+
+    /* ── HISTORY PANEL ── */
+    .history-panel {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: min(340px, 90vw);
+      background: var(--surface); border-right: 1px solid var(--border2);
+      z-index: 400; display: flex; flex-direction: column;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+      box-shadow: 8px 0 40px rgba(0,0,0,0.4);
+    }
+    .history-panel.open { transform: translateX(0); }
+
+    .history-panel-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1.4rem 1.4rem 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .history-panel-title {
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem;
+      letter-spacing: -0.02em;
+    }
+    .history-clear-btn {
+      font-family: 'Syne', sans-serif; font-size: 0.65rem; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--muted); background: none; border: 1px solid var(--border);
+      border-radius: 100px; padding: 0.25rem 0.65rem; cursor: none;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .history-clear-btn:hover { color: var(--accent-b); border-color: rgba(255,109,177,0.35); }
+    .history-close-btn {
+      background: none; border: none; color: var(--muted);
+      font-size: 0.9rem; cursor: none; padding: 0.2rem 0.4rem;
+      border-radius: 6px; transition: color 0.2s, background 0.2s;
+    }
+    .history-close-btn:hover { color: var(--text); background: var(--surface2); }
+
+    .history-list {
+      flex: 1; overflow-y: auto; padding: 0.6rem 0;
+    }
+    .history-list::-webkit-scrollbar { width: 4px; }
+    .history-list::-webkit-scrollbar-track { background: transparent; }
+    .history-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+    .history-item {
+      display: flex; align-items: center; gap: 0.8rem;
+      padding: 0.65rem 1.4rem; cursor: none;
+      transition: background 0.15s;
+    }
+    .history-item:hover { background: var(--surface2); }
+    .history-item-icon { color: var(--muted); flex-shrink: 0; opacity: 0.6; }
+    .history-item-text {
+      flex: 1; font-size: 0.85rem; color: var(--muted2);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      transition: color 0.15s; cursor: none;
+    }
+    .history-item:hover .history-item-text { color: var(--accent-a); }
+    .history-item-time { font-size: 0.62rem; color: var(--muted); white-space: nowrap; font-family: 'Syne', sans-serif; }
+    .history-item-del {
+      background: none; border: none; color: var(--muted); cursor: none;
+      font-size: 0.75rem; padding: 0.15rem 0.3rem; border-radius: 4px;
+      opacity: 0; transition: opacity 0.15s, color 0.15s;
+    }
+    .history-item:hover .history-item-del { opacity: 1; }
+    .history-item-del:hover { color: var(--accent-b); }
+
+    .history-empty {
+      text-align: center; padding: 3rem 1.5rem;
+      font-size: 0.82rem; color: var(--muted); line-height: 1.7;
+    }
+    .history-empty-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+
+    .history-disabled-msg {
+      text-align: center; padding: 2rem 1.5rem;
+      font-size: 0.8rem; color: var(--muted); line-height: 1.7;
+    }
+    .history-enable-btn {
+      display: inline-block; margin-top: 1rem;
+      background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
+      color: #0a0a0f; border: none; border-radius: 100px;
+      font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 800;
+      padding: 0.55rem 1.2rem; cursor: none; letter-spacing: 0.02em;
+    }
+
+    /* ── COOKIE BANNER ── */
+    .cookie-banner {
+      position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+      background: var(--surface2); border: 1px solid var(--border2);
+      border-radius: 16px; z-index: 500;
+      display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
+      padding: 1rem 1.2rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      max-width: min(560px, calc(100vw - 2rem));
+      animation: fadeUp 0.4s 0.5s ease both;
+      opacity: 0; animation-fill-mode: both;
+    }
+    .cookie-banner.hidden { display: none; }
+    .cookie-text {
+      font-size: 0.78rem; color: var(--muted2); line-height: 1.5; flex: 1;
+      display: flex; gap: 0.6rem; align-items: flex-start; min-width: 180px;
+    }
+    .cookie-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+    .cookie-btn {
+      font-family: 'Syne', sans-serif; font-size: 0.72rem; font-weight: 700;
+      border-radius: 100px; padding: 0.5rem 1.1rem; cursor: none;
+      letter-spacing: 0.02em; border: 1px solid; transition: all 0.2s;
+    }
+    .cookie-decline {
+      background: none; color: var(--muted); border-color: var(--border2);
+    }
+    .cookie-decline:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+    .cookie-accept {
+      background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
+      color: #0a0a0f; border-color: transparent;
+    }
+    .cookie-accept:hover { opacity: 0.88; }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
     @keyframes spin   { to { transform: rotate(360deg); } }
 
@@ -412,6 +555,39 @@
   <div id="cursor"></div>
   <div class="bg-glow"></div>
 
+  <!-- History button (top-left, always visible) -->
+  <button class="history-btn" id="history-btn" title="Search history" onclick="toggleHistory()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+    </svg>
+    <span>History</span>
+  </button>
+
+  <!-- History panel -->
+  <div class="history-panel" id="history-panel">
+    <div class="history-panel-header">
+      <span class="history-panel-title">Search History</span>
+      <div style="display:flex;gap:0.5rem;align-items:center;">
+        <button class="history-clear-btn" onclick="clearHistory()" title="Clear all history">Clear all</button>
+        <button class="history-close-btn" onclick="toggleHistory()" title="Close">✕</button>
+      </div>
+    </div>
+    <div class="history-list" id="history-list"></div>
+  </div>
+  <div class="history-overlay" id="history-overlay" onclick="toggleHistory()"></div>
+
+  <!-- Cookie consent banner -->
+  <div class="cookie-banner" id="cookie-banner">
+    <div class="cookie-text">
+      <span style="font-size:1rem;">🍪</span>
+      chin web can remember your searches using cookies stored on your device. No data leaves your browser.
+    </div>
+    <div class="cookie-actions">
+      <button class="cookie-btn cookie-decline" onclick="handleCookieChoice(false)">No thanks</button>
+      <button class="cookie-btn cookie-accept" onclick="handleCookieChoice(true)">Allow history</button>
+    </div>
+  </div>
+
   <main id="main">
 
     <div class="logo-area">
@@ -420,7 +596,7 @@
     </div>
 
     <div class="compact-header">
-      <a href="chinweb.html" class="compact-logo">chin<span class="grad">web</span></a>
+      <a href="search.chinberclart.dev" class="compact-logo">chin<span class="grad">web</span></a>
     </div>
 
     <div class="search-wrap">
@@ -471,9 +647,9 @@
   <footer>
     <div class="footer-logo">chin<span class="grad">web</span></div>
     <div class="footer-links">
-      <a href="index.html">chinberclart.dev</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="ai.html">AI Stance</a>
+      <a href="chinberclart.dev">chinberclart.dev</a>
+      <a href="chinberclart.dev/privacy">Privacy</a>
+      <a href="chinberclart.dev/ai">AI Stance</a>
     </div>
     <div class="footer-brave">
       <span class="brave-dot"></span>
@@ -821,6 +997,164 @@
         grid.innerHTML = `<div class="news-error">Add news.json to your repo to show posts here.</div>`;
       }
     }
+    // ── HISTORY & COOKIES ──────────────────────────────────────────────────────
+    const COOKIE_KEY   = 'chinweb_history_consent';
+    const HISTORY_KEY  = 'chinweb_history';
+    const MAX_HISTORY  = 50;
+
+    // Cookie helpers (plain document.cookie, no expiry set = session; we set 1yr)
+    function setCookie(name, value, days = 365) {
+      const expires = new Date(Date.now() + days * 864e5).toUTCString();
+      document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires};path=/;SameSite=Lax`;
+    }
+    function getCookie(name) {
+      const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
+      return match ? decodeURIComponent(match[1]) : null;
+    }
+    function deleteCookie(name) {
+      document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+    }
+
+    // Consent state
+    let historyEnabled = getCookie(COOKIE_KEY) === 'true';
+
+    function handleCookieChoice(allow) {
+      setCookie(COOKIE_KEY, allow ? 'true' : 'false');
+      historyEnabled = allow;
+      document.getElementById('cookie-banner').classList.add('hidden');
+      updateHistoryBtn();
+      if (!allow) {
+        deleteCookie(HISTORY_KEY);
+        document.getElementById('history-btn').classList.add('disabled');
+      }
+    }
+
+    function showCookieBannerIfNeeded() {
+      const consent = getCookie(COOKIE_KEY);
+      if (consent === null) {
+        // First visit — show banner after a short delay
+        setTimeout(() => {
+          document.getElementById('cookie-banner').classList.remove('hidden');
+        }, 1200);
+      } else {
+        document.getElementById('cookie-banner').classList.add('hidden');
+      }
+    }
+
+    // History read/write (stored as JSON in a cookie)
+    function getHistory() {
+      if (!historyEnabled) return [];
+      try { return JSON.parse(getCookie(HISTORY_KEY) || '[]'); } catch { return []; }
+    }
+
+    function addToHistory(query) {
+      if (!historyEnabled || !query.trim()) return;
+      let hist = getHistory();
+      // Remove duplicate if exists
+      hist = hist.filter(h => h.q.toLowerCase() !== query.toLowerCase());
+      hist.unshift({ q: query, t: Date.now() });
+      if (hist.length > MAX_HISTORY) hist = hist.slice(0, MAX_HISTORY);
+      setCookie(HISTORY_KEY, JSON.stringify(hist));
+      updateHistoryBtn();
+    }
+
+    function clearHistory() {
+      deleteCookie(HISTORY_KEY);
+      updateHistoryBtn();
+      renderHistoryList();
+    }
+
+    function deleteHistoryItem(idx) {
+      let hist = getHistory();
+      hist.splice(idx, 1);
+      setCookie(HISTORY_KEY, JSON.stringify(hist));
+      updateHistoryBtn();
+      renderHistoryList();
+    }
+
+    function updateHistoryBtn() {
+      const btn   = document.getElementById('history-btn');
+      const hist  = getHistory();
+      const count = hist.length;
+      // Update badge
+      const existing = btn.querySelector('.count-badge');
+      if (existing) existing.remove();
+      if (historyEnabled && count > 0) {
+        const badge = document.createElement('span');
+        badge.className = 'count-badge';
+        badge.textContent = count > 99 ? '99+' : count;
+        btn.appendChild(badge);
+        btn.classList.remove('disabled');
+      }
+      if (!historyEnabled) btn.classList.add('disabled');
+      else btn.classList.remove('disabled');
+    }
+
+    // Panel open/close
+    function toggleHistory() {
+      const panel   = document.getElementById('history-panel');
+      const overlay = document.getElementById('history-overlay');
+      const isOpen  = panel.classList.contains('open');
+      if (isOpen) {
+        panel.classList.remove('open');
+        overlay.classList.remove('open');
+      } else {
+        renderHistoryList();
+        panel.classList.add('open');
+        overlay.classList.add('open');
+      }
+    }
+
+    function renderHistoryList() {
+      const list = document.getElementById('history-list');
+      if (!historyEnabled) {
+        list.innerHTML = `
+          <div class="history-disabled-msg">
+            History is disabled. Allow cookies to start saving your searches.
+            <br>
+            <button class="history-enable-btn" onclick="handleCookieChoice(true);renderHistoryList();">Enable history</button>
+          </div>`;
+        return;
+      }
+      const hist = getHistory();
+      if (!hist.length) {
+        list.innerHTML = `
+          <div class="history-empty">
+            <div class="history-empty-icon">🕐</div>
+            Your searches will appear here.
+          </div>`;
+        return;
+      }
+      list.innerHTML = hist.map((item, i) => `
+        <div class="history-item" onclick="setQuery(${JSON.stringify(item.q)});doSearch();toggleHistory();">
+          <svg class="history-item-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <span class="history-item-text">${esc(item.q)}</span>
+          <span class="history-item-time">${timeAgo(item.t)}</span>
+          <button class="history-item-del" title="Remove" onclick="event.stopPropagation();deleteHistoryItem(${i});">✕</button>
+        </div>`).join('');
+      bindHover(list);
+    }
+
+    // Hook into doSearch to save history
+    const _origDoSearch = doSearch;
+    // We patch addToHistory into fetchResults instead, after we know query is valid
+    const _origFetchResults = fetchResults;
+    // Override: save to history when a real search fires
+    (function() {
+      const origDoSearch = doSearch;
+      window.doSearch = function(page = 0) {
+        const q = inp.value.trim();
+        if (q) addToHistory(q);
+        origDoSearch(page);
+      };
+    })();
+
+    // Init
+    showCookieBannerIfNeeded();
+    updateHistoryBtn();
+    bindHover(document.getElementById('history-panel'));
   </script>
 </body>
 </html>
