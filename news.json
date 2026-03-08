@@ -9,6 +9,13 @@
   },
   "items": [
     {
+      "title": "Privacy updare",
+      "description": "The new update details addsence, and cookie concent across BTFLY.SOCIAL and ChinWeb.",
+      "tag": "news",
+      "date": "2026-03-08T2:26:00Z",
+      "url": "https://chinberclart.dev/privacy"
+    },
+    {
       "title": "BTFLY.SOCIAL spec docs now live",
       "description": "The architecture and design specification for BTFLY is now published — covering Global Login, node types, auth flow, and the monetisation plan.",
       "tag": "update",
