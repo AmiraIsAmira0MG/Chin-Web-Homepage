@@ -7,6 +7,35 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+
+  <!-- Google Consent Mode v2 — must run BEFORE AdSense loads -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){ dataLayer.push(arguments); }
+
+    // Default: deny everything until user chooses
+    gtag('consent', 'default', {
+      ad_storage:              'denied',
+      ad_user_data:            'denied',
+      ad_personalization:      'denied',
+      analytics_storage:       'denied',
+      functionality_storage:   'denied',
+      personalization_storage: 'denied',
+      wait_for_update:         500,
+    });
+
+    // Restore previous consent if already given
+    (function() {
+      try {
+        const saved = JSON.parse(localStorage.getItem('chinweb_gcm') || 'null');
+        if (saved) gtag('consent', 'update', saved);
+      } catch {}
+    })();
+  </script>
+
+  <!-- AdSense — paste your real ca-pub tag here -->
+  <!-- <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX" crossorigin="anonymous"></script> -->
+
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
@@ -39,19 +68,11 @@
                   border-radius 0.22s ease, opacity 0.22s ease, border 0.22s ease;
       mix-blend-mode: screen;
     }
-    #cursor.big {
-      width: 40px; height: 40px;
-      background: rgba(169,255,203,0.12);
-      border: 1.5px solid var(--accent-a);
-    }
-    #cursor.text {
-      width: 2px; height: 20px;
-      border-radius: 2px; background: var(--accent-a);
-    }
-    /* Merge into the search box border — cursor shrinks to a point and fades */
-    #cursor.merge {
-      width: 0px; height: 0px; opacity: 0;
-    }
+    #cursor.big { width: 40px; height: 40px; background: rgba(169,255,203,0.12); border: 1.5px solid var(--accent-a); }
+    #cursor.text { width: 2px; height: 20px; border-radius: 2px; background: var(--accent-a); }
+    #cursor.merge { width: 0px; height: 0px; opacity: 0; }
+    /* AdSense ads need normal cursor */
+    ins.adsbygoogle, ins.adsbygoogle * { cursor: auto !important; }
     @media (max-width: 768px) { #cursor { display: none; } body { cursor: auto; } }
 
     /* ── GLOW BG ── */
@@ -97,17 +118,12 @@
       letter-spacing: 0.18em; text-transform: uppercase;
       display: flex; align-items: center; justify-content: center; gap: 0.5rem;
     }
-    .logo-sub::before, .logo-sub::after {
-      content: ''; display: block; width: 20px; height: 1px;
-    }
+    .logo-sub::before, .logo-sub::after { content: ''; display: block; width: 20px; height: 1px; }
     .logo-sub::before { background: linear-gradient(90deg, transparent, var(--muted)); }
     .logo-sub::after  { background: linear-gradient(90deg, var(--muted), transparent); }
 
     /* ── COMPACT HEADER ── */
-    .compact-header {
-      display: none; align-items: center; gap: 1.4rem;
-      width: 100%; max-width: 780px; margin-bottom: 1.5rem;
-    }
+    .compact-header { display: none; align-items: center; gap: 1.4rem; width: 100%; max-width: 780px; margin-bottom: 1.5rem; }
     main.has-results .compact-header { display: flex; }
     .compact-logo {
       font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem;
@@ -120,11 +136,9 @@
       width: 100%; max-width: 640px;
       animation: fadeUp 0.5s 0.1s ease both;
       transition: max-width 0.45s cubic-bezier(0.4,0,0.2,1);
-      position: relative;
-      z-index: 50;
+      position: relative; z-index: 50;
     }
     main.has-results .search-wrap { max-width: 780px; }
-
     .search-box {
       display: flex; align-items: center;
       background: var(--surface); border: 1px solid var(--border2);
@@ -133,19 +147,10 @@
       transition: border-color 0.3s ease, box-shadow 0.3s ease;
       position: relative;
     }
-    /* When cursor enters the search box zone, border glows — representing the merge */
-    .search-box.glowing {
-      border-color: rgba(169,255,203,0.55);
-      box-shadow: 0 0 0 3px rgba(169,255,203,0.1), 0 0 30px rgba(169,255,203,0.1);
-    }
-    .search-box:focus-within {
-      border-color: rgba(169,255,203,0.35);
-      box-shadow: 0 0 0 3px rgba(169,255,203,0.07), 0 8px 32px rgba(0,0,0,0.4);
-    }
+    .search-box.glowing { border-color: rgba(169,255,203,0.55); box-shadow: 0 0 0 3px rgba(169,255,203,0.1), 0 0 30px rgba(169,255,203,0.1); }
+    .search-box:focus-within { border-color: rgba(169,255,203,0.35); box-shadow: 0 0 0 3px rgba(169,255,203,0.07), 0 8px 32px rgba(0,0,0,0.4); }
     .search-icon { flex-shrink: 0; opacity: 0.4; transition: opacity 0.2s; }
-    .search-box.glowing .search-icon,
-    .search-box:focus-within .search-icon { opacity: 0.9; }
-
+    .search-box.glowing .search-icon, .search-box:focus-within .search-icon { opacity: 0.9; }
     .search-input {
       flex: 1; background: none; border: none; outline: none;
       font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 400;
@@ -178,23 +183,18 @@
       cursor: none; transition: border-color 0.2s, color 0.2s, background 0.2s;
       text-decoration: none;
     }
-    .shortcut-chip:hover {
-      border-color: rgba(169,255,203,0.3); color: var(--accent-a);
-      background: rgba(169,255,203,0.05);
-    }
+    .shortcut-chip:hover { border-color: rgba(169,255,203,0.3); color: var(--accent-a); background: rgba(169,255,203,0.05); }
 
     /* ── SUGGESTIONS DROPDOWN ── */
     .suggestions-dropdown {
       position: absolute; top: calc(100% + 8px); left: 0; right: 0;
       background: var(--surface); border: 1px solid var(--border2);
       border-radius: 16px; overflow-y: auto; overflow-x: hidden;
-      max-height: 360px;
-      z-index: 200; display: none;
+      max-height: 360px; z-index: 200; display: none;
       box-shadow: 0 16px 48px rgba(0,0,0,0.6);
       animation: fadeUp 0.15s ease both;
     }
     .suggestions-dropdown.open { display: block; }
-
     .sugg-group-label {
       font-family: 'Syne', sans-serif; font-size: 0.58rem; font-weight: 700;
       letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted);
@@ -202,30 +202,18 @@
     }
     .sugg-item {
       display: flex; align-items: center; gap: 0.75rem;
-      padding: 0.6rem 1.2rem;
-      cursor: none; transition: background 0.15s;
+      padding: 0.6rem 1.2rem; cursor: none; transition: background 0.15s;
       text-decoration: none; color: var(--text);
       border: none; background: none; width: 100%; text-align: left;
     }
-    .sugg-item:hover, .sugg-item.focused {
-      background: var(--surface2);
-    }
+    .sugg-item:hover, .sugg-item.focused { background: var(--surface2); }
     .sugg-item:hover .sugg-label, .sugg-item.focused .sugg-label { color: var(--accent-a); }
-    .sugg-icon {
-      font-size: 0.85rem; width: 20px; text-align: center; flex-shrink: 0;
-    }
-    .sugg-label {
-      font-size: 0.82rem; font-weight: 500; color: var(--muted2);
-      transition: color 0.15s; flex: 1;
-    }
-    .sugg-label mark {
-      background: none; color: var(--accent-a); font-weight: 700;
-    }
-    .sugg-type {
-      font-size: 0.6rem; font-family: 'Syne', sans-serif; font-weight: 700;
-      letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted);
-    }
+    .sugg-icon { font-size: 0.85rem; width: 20px; text-align: center; flex-shrink: 0; }
+    .sugg-label { font-size: 0.82rem; font-weight: 500; color: var(--muted2); transition: color 0.15s; flex: 1; }
+    .sugg-label mark { background: none; color: var(--accent-a); font-weight: 700; }
+    .sugg-type { font-size: 0.6rem; font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
     .sugg-divider { height: 1px; background: var(--border); margin: 0.2rem 0; }
+
     .search-badge {
       margin-top: 3rem;
       display: inline-flex; align-items: center; gap: 0.6rem;
@@ -237,10 +225,7 @@
     .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #ff6000; }
 
     /* ── NEWS FEED ── */
-    .news-section {
-      width: 100%; max-width: 640px; margin-top: 3.5rem;
-      animation: fadeUp 0.5s 0.35s ease both;
-    }
+    .news-section { width: 100%; max-width: 640px; margin-top: 3.5rem; animation: fadeUp 0.5s 0.35s ease both; }
     main.has-results .news-section { display: none; }
     .news-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.2rem; }
     .news-header-line { flex: 1; height: 1px; background: var(--border); }
@@ -250,20 +235,13 @@
       color: var(--muted); white-space: nowrap;
       display: flex; align-items: center; gap: 0.5rem;
     }
-    .news-live-dot {
-      width: 5px; height: 5px; border-radius: 50%;
-      background: var(--accent-a); animation: pulse 2s ease-in-out infinite;
-    }
+    .news-live-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent-a); animation: pulse 2s ease-in-out infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-    .news-grid {
-      display: flex; flex-direction: column; gap: 1px;
-      border-radius: 16px; overflow: hidden; border: 1px solid var(--border);
-    }
+    .news-grid { display: flex; flex-direction: column; gap: 1px; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); }
     .news-item {
       background: var(--surface); padding: 1.1rem 1.4rem;
       display: flex; gap: 1rem; align-items: flex-start;
-      text-decoration: none; color: inherit;
-      transition: background 0.2s; cursor: none;
+      text-decoration: none; color: inherit; transition: background 0.2s; cursor: none;
     }
     .news-item:hover { background: var(--surface2); }
     .news-item:hover .news-item-title { color: var(--accent-a); }
@@ -284,110 +262,52 @@
       line-height: 1.35; color: var(--text); transition: color 0.2s; margin-bottom: 0.25rem;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .news-item-desc {
-      font-size: 0.75rem; font-weight: 300; color: var(--muted2); line-height: 1.55;
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
-    }
-    .news-item-meta {
-      font-size: 0.65rem; color: var(--muted); margin-top: 0.4rem;
-      font-family: 'Syne', sans-serif; font-weight: 600; letter-spacing: 0.06em;
-    }
-    .news-loading {
-      display: flex; justify-content: center; align-items: center; gap: 0.5rem; padding: 2rem;
-      font-size: 0.72rem; color: var(--muted);
-      font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
-    }
-    .news-spinner {
-      width: 14px; height: 14px; border-radius: 50%;
-      border: 2px solid var(--border2); border-top-color: var(--accent-a);
-      animation: spin 0.8s linear infinite;
-    }
+    .news-item-desc { font-size: 0.75rem; font-weight: 300; color: var(--muted2); line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .news-item-meta { font-size: 0.65rem; color: var(--muted); margin-top: 0.4rem; font-family: 'Syne', sans-serif; font-weight: 600; letter-spacing: 0.06em; }
+    .news-loading { display: flex; justify-content: center; align-items: center; gap: 0.5rem; padding: 2rem; font-size: 0.72rem; color: var(--muted); font-family: 'Syne', sans-serif; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; }
+    .news-spinner { width: 14px; height: 14px; border-radius: 50%; border: 2px solid var(--border2); border-top-color: var(--accent-a); animation: spin 0.8s linear infinite; }
     .news-error { text-align: center; padding: 2rem; font-size: 0.78rem; color: var(--muted); }
 
     /* ── LOADING STATE ── */
-    .loading-state {
-      display: none; flex-direction: column; align-items: center; gap: 1.2rem;
-      padding: 4rem 0; width: 100%; max-width: 780px;
-    }
+    .loading-state { display: none; flex-direction: column; align-items: center; gap: 1.2rem; padding: 4rem 0; width: 100%; max-width: 780px; }
     main.is-loading .loading-state { display: flex; }
     main.is-loading .results-area  { display: none; }
     .loading-bar { width: 200px; height: 2px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
-    .loading-bar-inner {
-      height: 100%;
-      background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
-      border-radius: 2px; animation: load 1.4s ease-in-out infinite;
-    }
+    .loading-bar-inner { height: 100%; background: linear-gradient(90deg, var(--accent-a), var(--accent-b)); border-radius: 2px; animation: load 1.4s ease-in-out infinite; }
     @keyframes load { 0%{width:0%;margin-left:0%} 50%{width:60%;margin-left:20%} 100%{width:0%;margin-left:100%} }
-    .loading-label {
-      font-size: 0.7rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase;
-      font-family: 'Syne', sans-serif; font-weight: 700;
-    }
+    .loading-label { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; font-family: 'Syne', sans-serif; font-weight: 700; }
 
     /* ── RESULTS ── */
     .results-area { width: 100%; max-width: 780px; display: none; animation: fadeUp 0.35s ease both; }
     main.has-results .results-area { display: block; }
-    .results-meta {
-      font-size: 0.72rem; color: var(--muted); margin-bottom: 1.8rem; padding-left: 0.2rem;
-      display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap;
-    }
+    .results-meta { font-size: 0.72rem; color: var(--muted); margin-bottom: 1.8rem; padding-left: 0.2rem; display: flex; align-items: center; gap: 0.6rem; flex-wrap: wrap; }
     .results-meta-sep { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); }
-
-    .result-card {
-      margin-bottom: 1.4rem; padding: 1.3rem 1.5rem;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 16px; cursor: none; position: relative; overflow: hidden;
-      transition: border-color 0.2s, transform 0.15s;
-    }
-    .result-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(169,255,203,0), transparent);
-      transition: background 0.3s;
-    }
+    .result-card { margin-bottom: 1.4rem; padding: 1.3rem 1.5rem; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; cursor: none; position: relative; overflow: hidden; transition: border-color 0.2s, transform 0.15s; }
+    .result-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(169,255,203,0), transparent); transition: background 0.3s; }
     .result-card:hover { border-color: rgba(169,255,203,0.2); transform: translateY(-1px); }
     .result-card:hover::before { background: linear-gradient(90deg, transparent, rgba(169,255,203,0.3), transparent); }
-
     .result-url { display: flex; align-items: center; gap: 0.5rem; font-size: 0.7rem; color: var(--muted); margin-bottom: 0.45rem; }
     .result-favicon { width: 14px; height: 14px; border-radius: 3px; background: var(--surface2); flex-shrink: 0; overflow: hidden; }
     .result-favicon img { width: 100%; height: 100%; object-fit: cover; }
-    .result-title {
-      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem;
-      line-height: 1.3; margin-bottom: 0.5rem; color: var(--text);
-      text-decoration: none; display: block; transition: color 0.2s;
-    }
+    .result-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; line-height: 1.3; margin-bottom: 0.5rem; color: var(--text); text-decoration: none; display: block; transition: color 0.2s; }
     .result-card:hover .result-title { color: var(--accent-a); }
     .result-snippet { font-size: 0.82rem; font-weight: 300; line-height: 1.65; color: var(--muted2); }
     .result-snippet strong { color: var(--text); font-weight: 500; }
 
     /* ── PAGINATION ── */
     .pagination { display: flex; justify-content: center; gap: 0.5rem; padding: 1.5rem 0 2.5rem; flex-wrap: wrap; }
-    .page-btn {
-      background: var(--surface); border: 1px solid var(--border);
-      color: var(--muted2); border-radius: 100px;
-      padding: 0.5rem 1rem; font-family: 'Syne', sans-serif;
-      font-size: 0.75rem; font-weight: 700; cursor: none;
-      transition: border-color 0.2s, color 0.2s, background 0.2s;
-    }
-    .page-btn:hover, .page-btn.active {
-      border-color: rgba(169,255,203,0.35); color: var(--accent-a); background: rgba(169,255,203,0.05);
-    }
+    .page-btn { background: var(--surface); border: 1px solid var(--border); color: var(--muted2); border-radius: 100px; padding: 0.5rem 1rem; font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 700; cursor: none; transition: border-color 0.2s, color 0.2s, background 0.2s; }
+    .page-btn:hover, .page-btn.active { border-color: rgba(169,255,203,0.35); color: var(--accent-a); background: rgba(169,255,203,0.05); }
     .page-btn.active { pointer-events: none; }
 
     /* ── EMPTY / ERROR ── */
-    .results-empty {
-      text-align: center; padding: 4rem 2rem;
-      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
-    }
+    .results-empty { text-align: center; padding: 4rem 2rem; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; }
     .results-empty-icon { font-size: 2.5rem; margin-bottom: 1rem; }
     .results-empty-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 0.6rem; }
     .results-empty-desc { font-size: 0.85rem; color: var(--muted2); line-height: 1.7; }
 
     /* ── FOOTER ── */
-    footer {
-      position: relative; z-index: 1; border-top: 1px solid var(--border);
-      padding: 1.2rem 2rem;
-      display: flex; justify-content: space-between; align-items: center;
-      flex-wrap: wrap; gap: 0.8rem; font-size: 0.68rem; color: var(--muted);
-    }
+    footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.8rem; font-size: 0.68rem; color: var(--muted); }
     footer a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
     footer a:hover { color: var(--accent-a); }
     .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.82rem; letter-spacing: -0.02em; }
@@ -408,138 +328,111 @@
     }
     .history-btn:hover { border-color: rgba(169,255,203,0.35); color: var(--accent-a); background: rgba(169,255,203,0.05); }
     .history-btn.disabled { opacity: 0.3; pointer-events: none; }
-    .history-btn .count-badge {
-      background: var(--accent-a); color: #0a0a0f;
-      border-radius: 100px; font-size: 0.6rem; font-weight: 800;
-      padding: 0.1rem 0.4rem; margin-left: 0.1rem; line-height: 1.4;
-    }
+    .history-btn .count-badge { background: var(--accent-a); color: #0a0a0f; border-radius: 100px; font-size: 0.6rem; font-weight: 800; padding: 0.1rem 0.4rem; margin-left: 0.1rem; line-height: 1.4; }
 
-    /* ── HISTORY OVERLAY ── */
-    .history-overlay {
-      position: fixed; inset: 0; z-index: 350;
-      background: rgba(0,0,0,0.4); backdrop-filter: blur(2px);
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.25s ease;
-    }
+    /* ── HISTORY OVERLAY + PANEL ── */
+    .history-overlay { position: fixed; inset: 0; z-index: 350; background: rgba(0,0,0,0.4); backdrop-filter: blur(2px); opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
     .history-overlay.open { opacity: 1; pointer-events: all; }
-
-    /* ── HISTORY PANEL ── */
-    .history-panel {
-      position: fixed; top: 0; left: 0; bottom: 0;
-      width: min(340px, 90vw);
-      background: var(--surface); border-right: 1px solid var(--border2);
-      z-index: 400; display: flex; flex-direction: column;
-      transform: translateX(-100%);
-      transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
-      box-shadow: 8px 0 40px rgba(0,0,0,0.4);
-    }
+    .history-panel { position: fixed; top: 0; left: 0; bottom: 0; width: min(340px, 90vw); background: var(--surface); border-right: 1px solid var(--border2); z-index: 400; display: flex; flex-direction: column; transform: translateX(-100%); transition: transform 0.3s cubic-bezier(0.4,0,0.2,1); box-shadow: 8px 0 40px rgba(0,0,0,0.4); }
     .history-panel.open { transform: translateX(0); }
-
-    .history-panel-header {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 1.4rem 1.4rem 1rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .history-panel-title {
-      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem;
-      letter-spacing: -0.02em;
-    }
-    .history-clear-btn {
-      font-family: 'Syne', sans-serif; font-size: 0.65rem; font-weight: 700;
-      letter-spacing: 0.08em; text-transform: uppercase;
-      color: var(--muted); background: none; border: 1px solid var(--border);
-      border-radius: 100px; padding: 0.25rem 0.65rem; cursor: none;
-      transition: color 0.2s, border-color 0.2s;
-    }
+    .history-panel-header { display: flex; justify-content: space-between; align-items: center; padding: 1.4rem 1.4rem 1rem; border-bottom: 1px solid var(--border); }
+    .history-panel-title { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; letter-spacing: -0.02em; }
+    .history-clear-btn { font-family: 'Syne', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); background: none; border: 1px solid var(--border); border-radius: 100px; padding: 0.25rem 0.65rem; cursor: none; transition: color 0.2s, border-color 0.2s; }
     .history-clear-btn:hover { color: var(--accent-b); border-color: rgba(255,109,177,0.35); }
-    .history-close-btn {
-      background: none; border: none; color: var(--muted);
-      font-size: 0.9rem; cursor: none; padding: 0.2rem 0.4rem;
-      border-radius: 6px; transition: color 0.2s, background 0.2s;
-    }
+    .history-close-btn { background: none; border: none; color: var(--muted); font-size: 0.9rem; cursor: none; padding: 0.2rem 0.4rem; border-radius: 6px; transition: color 0.2s, background 0.2s; }
     .history-close-btn:hover { color: var(--text); background: var(--surface2); }
-
-    .history-list {
-      flex: 1; overflow-y: auto; padding: 0.6rem 0;
-    }
+    .history-list { flex: 1; overflow-y: auto; padding: 0.6rem 0; }
     .history-list::-webkit-scrollbar { width: 4px; }
     .history-list::-webkit-scrollbar-track { background: transparent; }
     .history-list::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
-    .history-item {
-      display: flex; align-items: center; gap: 0.8rem;
-      padding: 0.65rem 1.4rem; cursor: none;
-      transition: background 0.15s;
-    }
+    .history-item { display: flex; align-items: center; gap: 0.8rem; padding: 0.65rem 1.4rem; cursor: none; transition: background 0.15s; }
     .history-item:hover { background: var(--surface2); }
     .history-item-icon { color: var(--muted); flex-shrink: 0; opacity: 0.6; }
-    .history-item-text {
-      flex: 1; font-size: 0.85rem; color: var(--muted2);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-      transition: color 0.15s; cursor: none;
-    }
+    .history-item-text { flex: 1; font-size: 0.85rem; color: var(--muted2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: color 0.15s; cursor: none; }
     .history-item:hover .history-item-text { color: var(--accent-a); }
     .history-item-time { font-size: 0.62rem; color: var(--muted); white-space: nowrap; font-family: 'Syne', sans-serif; }
-    .history-item-del {
-      background: none; border: none; color: var(--muted); cursor: none;
-      font-size: 0.75rem; padding: 0.15rem 0.3rem; border-radius: 4px;
-      opacity: 0; transition: opacity 0.15s, color 0.15s;
-    }
+    .history-item-del { background: none; border: none; color: var(--muted); cursor: none; font-size: 0.75rem; padding: 0.15rem 0.3rem; border-radius: 4px; opacity: 0; transition: opacity 0.15s, color 0.15s; }
     .history-item:hover .history-item-del { opacity: 1; }
     .history-item-del:hover { color: var(--accent-b); }
-
-    .history-empty {
-      text-align: center; padding: 3rem 1.5rem;
-      font-size: 0.82rem; color: var(--muted); line-height: 1.7;
-    }
+    .history-empty { text-align: center; padding: 3rem 1.5rem; font-size: 0.82rem; color: var(--muted); line-height: 1.7; }
     .history-empty-icon { font-size: 2rem; margin-bottom: 0.8rem; }
-
-    .history-disabled-msg {
-      text-align: center; padding: 2rem 1.5rem;
-      font-size: 0.8rem; color: var(--muted); line-height: 1.7;
-    }
-    .history-enable-btn {
-      display: inline-block; margin-top: 1rem;
-      background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
-      color: #0a0a0f; border: none; border-radius: 100px;
-      font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 800;
-      padding: 0.55rem 1.2rem; cursor: none; letter-spacing: 0.02em;
-    }
+    .history-disabled-msg { text-align: center; padding: 2rem 1.5rem; font-size: 0.8rem; color: var(--muted); line-height: 1.7; }
+    .history-enable-btn { display: inline-block; margin-top: 1rem; background: linear-gradient(135deg, var(--accent-a), var(--accent-b)); color: #0a0a0f; border: none; border-radius: 100px; font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 800; padding: 0.55rem 1.2rem; cursor: none; letter-spacing: 0.02em; }
 
     /* ── COOKIE BANNER ── */
     .cookie-banner {
       position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
       background: var(--surface2); border: 1px solid var(--border2);
-      border-radius: 16px; z-index: 500;
-      display: flex; align-items: center; gap: 1.2rem; flex-wrap: wrap;
-      padding: 1rem 1.2rem;
-      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
-      max-width: min(560px, calc(100vw - 2rem));
-      animation: fadeUp 0.4s 0.5s ease both;
+      border-radius: 20px; z-index: 500;
+      padding: 1.4rem 1.6rem;
+      box-shadow: 0 8px 48px rgba(0,0,0,0.6);
+      max-width: min(600px, calc(100vw - 2rem));
+      animation: fadeUp 0.4s 0.8s ease both;
       opacity: 0; animation-fill-mode: both;
     }
     .cookie-banner.hidden { display: none; }
-    .cookie-text {
-      font-size: 0.78rem; color: var(--muted2); line-height: 1.5; flex: 1;
-      display: flex; gap: 0.6rem; align-items: flex-start; min-width: 180px;
+
+    .cookie-title {
+      font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.9rem;
+      margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem;
     }
-    .cookie-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+    .cookie-body {
+      font-size: 0.76rem; color: var(--muted2); line-height: 1.6;
+      margin-bottom: 1.1rem;
+    }
+
+    /* Toggle rows */
+    .cookie-toggles { display: flex; flex-direction: column; gap: 0.7rem; margin-bottom: 1.2rem; }
+    .cookie-toggle-row {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      background: var(--surface); border-radius: 12px; padding: 0.7rem 1rem;
+      border: 1px solid var(--border);
+    }
+    .cookie-toggle-info { flex: 1; }
+    .cookie-toggle-label { font-family: 'Syne', sans-serif; font-size: 0.75rem; font-weight: 700; margin-bottom: 0.15rem; }
+    .cookie-toggle-desc { font-size: 0.68rem; color: var(--muted); line-height: 1.4; }
+
+    /* Toggle switch */
+    .toggle-switch { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-track {
+      position: absolute; inset: 0; border-radius: 100px;
+      background: var(--surface2); border: 1px solid var(--border2);
+      cursor: none; transition: background 0.2s, border-color 0.2s;
+    }
+    .toggle-switch input:checked + .toggle-track { background: var(--accent-a); border-color: var(--accent-a); }
+    .toggle-track::after {
+      content: ''; position: absolute; top: 2px; left: 2px;
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #fff; transition: transform 0.2s ease;
+    }
+    .toggle-switch input:checked + .toggle-track::after { transform: translateX(16px); }
+    .toggle-switch.locked .toggle-track { opacity: 0.5; cursor: not-allowed; }
+
+    /* Action buttons */
+    .cookie-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
     .cookie-btn {
       font-family: 'Syne', sans-serif; font-size: 0.72rem; font-weight: 700;
-      border-radius: 100px; padding: 0.5rem 1.1rem; cursor: none;
-      letter-spacing: 0.02em; border: 1px solid; transition: all 0.2s;
+      border-radius: 100px; padding: 0.55rem 1.2rem; cursor: none;
+      letter-spacing: 0.02em; border: 1px solid; transition: all 0.2s; flex: 1;
     }
-    .cookie-decline {
-      background: none; color: var(--muted); border-color: var(--border2);
-    }
-    .cookie-decline:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
-    .cookie-accept {
-      background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
-      color: #0a0a0f; border-color: transparent;
-    }
-    .cookie-accept:hover { opacity: 0.88; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    .cookie-reject-all { background: none; color: var(--muted); border-color: var(--border2); }
+    .cookie-reject-all:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+    .cookie-save { background: var(--surface); color: var(--muted2); border-color: var(--border2); }
+    .cookie-save:hover { border-color: rgba(169,255,203,0.35); color: var(--accent-a); }
+    .cookie-accept-all { background: linear-gradient(135deg, var(--accent-a), var(--accent-b)); color: #0a0a0f; border-color: transparent; flex: 2; }
+    .cookie-accept-all:hover { opacity: 0.88; }
+
+    /* Manage link in footer */
+    .cookie-manage-link { color: var(--muted); text-decoration: none; cursor: none; transition: color 0.2s; }
+    .cookie-manage-link:hover { color: var(--accent-a); }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px) translateX(-50%); } to { opacity: 1; transform: translateY(0) translateX(-50%); } }
     @keyframes spin   { to { transform: rotate(360deg); } }
+    @keyframes fadeUpSimple { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+    /* Override the logo-area, shortcuts etc to use fadeUpSimple */
+    .logo-area, .search-wrap, .shortcuts, .search-badge, .news-section { animation-name: fadeUpSimple; }
 
     @media (max-width: 600px) {
       .search-btn span { display: none; }
@@ -547,6 +440,7 @@
       .logo-wordmark { font-size: 3rem; }
       footer { justify-content: center; text-align: center; }
       .footer-links { justify-content: center; }
+      .cookie-banner { padding: 1.1rem; }
     }
   </style>
 </head>
@@ -555,7 +449,7 @@
   <div id="cursor"></div>
   <div class="bg-glow"></div>
 
-  <!-- History button (top-left, always visible) -->
+  <!-- History button -->
   <button class="history-btn" id="history-btn" title="Search history" onclick="toggleHistory()">
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
@@ -568,8 +462,8 @@
     <div class="history-panel-header">
       <span class="history-panel-title">Search History</span>
       <div style="display:flex;gap:0.5rem;align-items:center;">
-        <button class="history-clear-btn" onclick="clearHistory()" title="Clear all history">Clear all</button>
-        <button class="history-close-btn" onclick="toggleHistory()" title="Close">✕</button>
+        <button class="history-clear-btn" onclick="clearHistory()">Clear all</button>
+        <button class="history-close-btn" onclick="toggleHistory()">✕</button>
       </div>
     </div>
     <div class="history-list" id="history-list"></div>
@@ -577,19 +471,60 @@
   <div class="history-overlay" id="history-overlay" onclick="toggleHistory()"></div>
 
   <!-- Cookie consent banner -->
-  <div class="cookie-banner" id="cookie-banner">
-    <div class="cookie-text">
-      <span style="font-size:1rem;">🍪</span>
-      chin web can remember your searches using cookies stored on your device. No data leaves your browser.
+  <div class="cookie-banner hidden" id="cookie-banner">
+    <div class="cookie-title">🍪 Cookie preferences</div>
+    <div class="cookie-body">
+      chin web uses cookies to personalise ads (via Google AdSense) and to remember your search history.
+      Both are optional — essential cookies required to run the site are always active.
+      No data from either is sent to chinberclart.dev servers.
     </div>
+
+    <div class="cookie-toggles">
+      <!-- Always on -->
+      <div class="cookie-toggle-row">
+        <div class="cookie-toggle-info">
+          <div class="cookie-toggle-label">Essential</div>
+          <div class="cookie-toggle-desc">Required for the site to function. Cannot be disabled.</div>
+        </div>
+        <label class="toggle-switch locked">
+          <input type="checkbox" checked disabled>
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+
+      <!-- Search history -->
+      <div class="cookie-toggle-row">
+        <div class="cookie-toggle-info">
+          <div class="cookie-toggle-label">Search history</div>
+          <div class="cookie-toggle-desc">Saves your recent searches in a cookie on this device only.</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggle-history">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+
+      <!-- Advertising -->
+      <div class="cookie-toggle-row">
+        <div class="cookie-toggle-info">
+          <div class="cookie-toggle-label">Advertising (Google AdSense)</div>
+          <div class="cookie-toggle-desc">Allows Google to show personalised ads. Declining shows non-personalised ads instead.</div>
+        </div>
+        <label class="toggle-switch">
+          <input type="checkbox" id="toggle-ads">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
+
     <div class="cookie-actions">
-      <button class="cookie-btn cookie-decline" onclick="handleCookieChoice(false)">No thanks</button>
-      <button class="cookie-btn cookie-accept" onclick="handleCookieChoice(true)">Allow history</button>
+      <button class="cookie-btn cookie-reject-all" onclick="applyConsent(false, false)">Reject all</button>
+      <button class="cookie-btn cookie-save"       onclick="saveConsent()">Save choices</button>
+      <button class="cookie-btn cookie-accept-all" onclick="applyConsent(true, true)">Accept all</button>
     </div>
   </div>
 
   <main id="main">
-
     <div class="logo-area">
       <div class="logo-wordmark">chin<span class="grad">web</span></div>
       <div class="logo-sub">search the web</div>
@@ -610,9 +545,9 @@
           <span>Search</span>
         </button>
       </div>
-      <!-- Suggestions dropdown -->
       <div class="suggestions-dropdown" id="suggestions-dropdown"></div>
     </div>
+
     <div class="shortcuts" id="shortcuts-row"></div>
 
     <div class="search-badge">
@@ -641,7 +576,6 @@
       <div id="results-list"></div>
       <div class="pagination" id="pagination"></div>
     </div>
-
   </main>
 
   <footer>
@@ -650,6 +584,7 @@
       <a href="https://chinberclart.dev">chinberclart.dev</a>
       <a href="https://chinberclart.dev/privacy">Privacy</a>
       <a href="https://chinberclart.dev/ai">AI Stance</a>
+      <a href="#" class="cookie-manage-link" onclick="reopenBanner();return false;">Cookie settings</a>
     </div>
     <div class="footer-brave">
       <span class="brave-dot"></span>
@@ -658,12 +593,8 @@
   </footer>
 
   <script>
-    // ─────────────────────────────────────────
-    // CONFIG: replace with your deployed Worker URL
     const WORKER_URL = 'https://api.search.chinberclart.dev';
-    // ─────────────────────────────────────────
-
-    const PER_PAGE = 10;
+    const PER_PAGE   = 10;
     let currentQuery = '', currentPage = 0;
 
     // ── CURSOR ──
@@ -677,40 +608,22 @@
     });
 
     function bindHover(root = document) {
-      root.querySelectorAll('a, button, .shortcut-chip, .page-btn').forEach(el => {
+      root.querySelectorAll('a, button, .shortcut-chip, .page-btn, label').forEach(el => {
         el.addEventListener('mouseenter', () => { cursor.className = 'big'; });
         el.addEventListener('mouseleave', () => { cursor.className = '';   });
       });
     }
     bindHover();
 
-    // Input: text-beam cursor
     inp.addEventListener('mouseenter', () => { cursor.className = 'text'; });
     inp.addEventListener('mouseleave', () => { cursor.className = ''; });
-
-    // Search box padding zone: cursor merges into border
-    searchBox.addEventListener('mouseenter', () => {
-      cursor.className = 'merge';
-      searchBox.classList.add('glowing');
-    });
-    searchBox.addEventListener('mouseleave', () => {
-      cursor.className = '';
-      searchBox.classList.remove('glowing');
-    });
-    // When over the actual input, switch to text beam (override merge)
-    inp.addEventListener('mouseenter', () => {
-      cursor.className = 'text';
-      searchBox.classList.add('glowing');
-    });
-    // Btn override
-    document.getElementById('search-btn').addEventListener('mouseenter', () => {
-      cursor.className = 'big';
-      searchBox.classList.add('glowing');
-    });
+    searchBox.addEventListener('mouseenter', () => { cursor.className = 'merge'; searchBox.classList.add('glowing'); });
+    searchBox.addEventListener('mouseleave', () => { cursor.className = ''; searchBox.classList.remove('glowing'); });
+    inp.addEventListener('mouseenter', () => { cursor.className = 'text'; searchBox.classList.add('glowing'); });
+    document.getElementById('search-btn').addEventListener('mouseenter', () => { cursor.className = 'big'; searchBox.classList.add('glowing'); });
 
     // ── SEARCH ──
     const main = document.getElementById('main');
-
     function setQuery(q) { inp.value = q; }
 
     function doSearch(page = 0) {
@@ -718,25 +631,19 @@
       if (!q) return;
       currentQuery = q; currentPage = page;
       const url = new URL(window.location.href);
-      url.searchParams.set('q', q);
-      url.searchParams.set('p', page);
+      url.searchParams.set('q', q); url.searchParams.set('p', page);
       window.history.pushState({}, '', url);
       main.classList.remove('has-results');
       main.classList.add('has-results', 'is-loading');
+      addToHistory(q);
       fetchResults(q, page);
     }
 
     async function fetchResults(q, page) {
       try {
-        const res = await fetch(
-          `${WORKER_URL}?q=${encodeURIComponent(q)}&offset=${page * PER_PAGE}&count=${PER_PAGE}`
-        );
-        if (!res.ok) {
-          const err = await res.json().catch(() => ({}));
-          throw new Error(err.error || `HTTP ${res.status}`);
-        }
-        const data = await res.json();
-        renderResults(data, q, page);
+        const res = await fetch(`${WORKER_URL}?q=${encodeURIComponent(q)}&offset=${page * PER_PAGE}&count=${PER_PAGE}`);
+        if (!res.ok) { const err = await res.json().catch(()=>({})); throw new Error(err.error || `HTTP ${res.status}`); }
+        renderResults(await res.json(), q, page);
       } catch (err) {
         showError('Search failed', err.message || 'Could not reach the search worker.');
       } finally {
@@ -747,64 +654,36 @@
     function renderResults(data, q, page) {
       const results = data.web?.results || [];
       const total   = data.web?.total_count || 0;
-
       document.getElementById('results-meta').innerHTML = `
         <span>Results for <strong style="color:var(--text)">${esc(q)}</strong></span>
         <span class="results-meta-sep"></span>
         <span>${total.toLocaleString()} results</span>
         <span class="results-meta-sep"></span>
         <span>Brave Search</span>`;
-
       const list = document.getElementById('results-list');
-
       if (!results.length) {
-        list.innerHTML = `<div class="results-empty">
-          <div class="results-empty-icon">🔍</div>
-          <div class="results-empty-title">No results found</div>
-          <div class="results-empty-desc">Try different keywords or check your spelling.</div>
-        </div>`;
-        document.getElementById('pagination').innerHTML = '';
-        return;
+        list.innerHTML = `<div class="results-empty"><div class="results-empty-icon">🔍</div><div class="results-empty-title">No results found</div><div class="results-empty-desc">Try different keywords or check your spelling.</div></div>`;
+        document.getElementById('pagination').innerHTML = ''; return;
       }
-
       list.innerHTML = results.map(r => {
-        let domain = '';
-        try { domain = new URL(r.url).hostname.replace('www.',''); } catch {}
-        const favicon = r.profile?.img
-          ? `<img src="${esc(r.profile.img)}" alt="" loading="lazy" onerror="this.style.display='none'">`
-          : '';
+        let domain = ''; try { domain = new URL(r.url).hostname.replace('www.',''); } catch {}
+        const favicon = r.profile?.img ? `<img src="${esc(r.profile.img)}" alt="" loading="lazy" onerror="this.style.display='none'">` : '';
         return `<div class="result-card">
-          <div class="result-url">
-            <span class="result-favicon">${favicon}</span>
-            <span>${esc(domain)}</span>
-          </div>
+          <div class="result-url"><span class="result-favicon">${favicon}</span><span>${esc(domain)}</span></div>
           <a class="result-title" href="${esc(r.url)}" target="_blank" rel="noopener">${esc(r.title)}</a>
           <div class="result-snippet">${r.description || ''}</div>
         </div>`;
       }).join('');
-
-      // Pagination (Brave supports up to offset 9, so max 10 pages)
       const totalPages = Math.min(Math.ceil(total / PER_PAGE), 10);
       const pag = document.getElementById('pagination');
-      pag.innerHTML = totalPages > 1
-        ? Array.from({length: totalPages}, (_,i) =>
-            `<button class="page-btn${i===page?' active':''}" onclick="doSearch(${i})">${i+1}</button>`
-          ).join('')
-        : '';
-
-      bindHover(list);
-      bindHover(pag);
+      pag.innerHTML = totalPages > 1 ? Array.from({length: totalPages}, (_,i) => `<button class="page-btn${i===page?' active':''}" onclick="doSearch(${i})">${i+1}</button>`).join('') : '';
+      bindHover(list); bindHover(pag);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function showError(title, desc) {
       main.classList.remove('is-loading');
-      document.getElementById('results-list').innerHTML = `
-        <div class="results-empty">
-          <div class="results-empty-icon">⚠️</div>
-          <div class="results-empty-title">${esc(title)}</div>
-          <div class="results-empty-desc">${esc(desc)}</div>
-        </div>`;
+      document.getElementById('results-list').innerHTML = `<div class="results-empty"><div class="results-empty-icon">⚠️</div><div class="results-empty-title">${esc(title)}</div><div class="results-empty-desc">${esc(desc)}</div></div>`;
       document.getElementById('pagination').innerHTML = '';
     }
 
@@ -815,34 +694,14 @@
 
     // ── KEYBOARD ──
     let focusedSuggIdx = -1;
-
     inp.addEventListener('keydown', e => {
       const items = dropdown.querySelectorAll('.sugg-item');
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        focusedSuggIdx = Math.min(focusedSuggIdx + 1, items.length - 1);
-        items.forEach((el,i) => el.classList.toggle('focused', i === focusedSuggIdx));
-        if (items[focusedSuggIdx]) items[focusedSuggIdx].scrollIntoView({block:'nearest'});
-        return;
-      }
-      if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        focusedSuggIdx = Math.max(focusedSuggIdx - 1, -1);
-        items.forEach((el,i) => el.classList.toggle('focused', i === focusedSuggIdx));
-        return;
-      }
-      if (e.key === 'Enter') {
-        if (focusedSuggIdx >= 0 && items[focusedSuggIdx]) {
-          items[focusedSuggIdx].click(); return;
-        }
-        doSearch(0); return;
-      }
-      if (e.key === 'Escape') { closeDropdown(); inp.blur(); }
+      if (e.key === 'ArrowDown') { e.preventDefault(); focusedSuggIdx = Math.min(focusedSuggIdx+1, items.length-1); items.forEach((el,i)=>el.classList.toggle('focused',i===focusedSuggIdx)); if(items[focusedSuggIdx])items[focusedSuggIdx].scrollIntoView({block:'nearest'}); return; }
+      if (e.key === 'ArrowUp')   { e.preventDefault(); focusedSuggIdx = Math.max(focusedSuggIdx-1,-1); items.forEach((el,i)=>el.classList.toggle('focused',i===focusedSuggIdx)); return; }
+      if (e.key === 'Enter')     { if(focusedSuggIdx>=0&&items[focusedSuggIdx]){items[focusedSuggIdx].click();return;} doSearch(0); return; }
+      if (e.key === 'Escape')    { closeDropdown(); inp.blur(); }
     });
-
-    document.addEventListener('keydown', e => {
-      if (e.key === '/' && document.activeElement !== inp) { e.preventDefault(); inp.focus(); }
-    });
+    document.addEventListener('keydown', e => { if(e.key==='/'&&document.activeElement!==inp){e.preventDefault();inp.focus();} });
 
     // ── ON LOAD ──
     window.addEventListener('DOMContentLoaded', () => {
@@ -850,6 +709,9 @@
       if (p.get('q')) { inp.value = p.get('q'); doSearch(parseInt(p.get('p')||'0',10)); }
       loadSuggestions();
       loadNews();
+      initConsent();
+      bindHover(document.getElementById('history-panel'));
+      bindHover(document.getElementById('cookie-banner'));
     });
 
     // ── SUGGESTIONS ──
@@ -860,188 +722,182 @@
       try {
         const res = await fetch('suggestions.json');
         if (!res.ok) throw 0;
-        const data = await res.json();
-        allSuggestions = data.suggestions || [];
+        allSuggestions = (await res.json()).suggestions || [];
         renderShortcuts();
-      } catch {
-        // silently skip if no suggestions.json
-      }
+      } catch {}
     }
 
     function renderShortcuts() {
-      // Show "my projects" + "search" groups as homepage chips
       const row = document.getElementById('shortcuts-row');
-      const show = allSuggestions.filter(g => g.group === 'my projects' || g.group === 'search');
-      const chips = show.flatMap(g => g.items);
-      row.innerHTML = chips.map(item => {
-        if (item.url) {
-          return `<a class="shortcut-chip" href="${esc(item.url)}">${item.icon} ${esc(item.label)}</a>`;
-        }
-        return `<button class="shortcut-chip" onclick="setQuery(${JSON.stringify(item.query)});doSearch();return false;">${item.icon} ${esc(item.label)}</button>`;
-      }).join('');
+      const chips = allSuggestions.filter(g=>g.group==='my projects'||g.group==='search').flatMap(g=>g.items);
+      row.innerHTML = chips.map(item => item.url
+        ? `<a class="shortcut-chip" href="${esc(item.url)}">${item.icon} ${esc(item.label)}</a>`
+        : `<button class="shortcut-chip" onclick="setQuery(${JSON.stringify(item.query)});doSearch();">${item.icon} ${esc(item.label)}</button>`
+      ).join('');
       bindHover(row);
     }
 
     function openDropdown(filtered) {
       if (!filtered.length) { closeDropdown(); return; }
       focusedSuggIdx = -1;
-
-      // Group results by their source group
       const grouped = {};
-      filtered.forEach(({group, item}) => {
-        if (!grouped[group]) grouped[group] = [];
-        grouped[group].push(item);
-      });
-
-      dropdown.innerHTML = Object.entries(grouped).map(([group, items], gi) => `
-        ${gi > 0 ? '<div class="sugg-divider"></div>' : ''}
+      filtered.forEach(({group,item}) => { if(!grouped[group])grouped[group]=[]; grouped[group].push(item); });
+      dropdown.innerHTML = Object.entries(grouped).map(([group,items],gi) => `
+        ${gi>0?'<div class="sugg-divider"></div>':''}
         <div class="sugg-group-label">${group}</div>
         ${items.map(item => {
-          const typeLabel = item.url ? '↗' : '🔍';
-          const highlighted = highlightMatch(item.label, inp.value.trim());
-          if (item.url) {
-            return `<a class="sugg-item" href="${esc(item.url)}">
-              <span class="sugg-icon">${item.icon}</span>
-              <span class="sugg-label">${highlighted}</span>
-              <span class="sugg-type">${typeLabel}</span>
-            </a>`;
-          }
-          return `<button class="sugg-item" onclick="setQuery(${JSON.stringify(item.query||item.label)});doSearch();">
-            <span class="sugg-icon">${item.icon}</span>
-            <span class="sugg-label">${highlighted}</span>
-            <span class="sugg-type">${typeLabel}</span>
-          </button>`;
-        }).join('')}
-      `).join('');
-
+          const h = highlightMatch(item.label, inp.value.trim());
+          return item.url
+            ? `<a class="sugg-item" href="${esc(item.url)}"><span class="sugg-icon">${item.icon}</span><span class="sugg-label">${h}</span><span class="sugg-type">↗</span></a>`
+            : `<button class="sugg-item" onclick="setQuery(${JSON.stringify(item.query||item.label)});doSearch();"><span class="sugg-icon">${item.icon}</span><span class="sugg-label">${h}</span><span class="sugg-type">🔍</span></button>`;
+        }).join('')}`
+      ).join('');
       dropdown.classList.add('open');
       bindHover(dropdown);
     }
 
-    function closeDropdown() {
-      dropdown.classList.remove('open');
-      focusedSuggIdx = -1;
-    }
+    function closeDropdown() { dropdown.classList.remove('open'); focusedSuggIdx = -1; }
 
     function highlightMatch(label, query) {
       if (!query) return esc(label);
       const idx = label.toLowerCase().indexOf(query.toLowerCase());
       if (idx === -1) return esc(label);
-      return esc(label.slice(0, idx)) +
-        `<mark>${esc(label.slice(idx, idx + query.length))}</mark>` +
-        esc(label.slice(idx + query.length));
+      return esc(label.slice(0,idx)) + `<mark>${esc(label.slice(idx,idx+query.length))}</mark>` + esc(label.slice(idx+query.length));
     }
 
-    // Filter suggestions as user types
     inp.addEventListener('input', () => {
       const q = inp.value.trim();
       if (!q) { closeDropdown(); return; }
-
       const results = [];
-      allSuggestions.forEach(group => {
-        group.items.forEach(item => {
-          const searchable = (item.label + ' ' + (item.query||'') + ' ' + (item.url||'')).toLowerCase();
-          if (searchable.includes(q.toLowerCase())) {
-            results.push({ group: group.group, item });
-          }
-        });
-      });
+      allSuggestions.forEach(group => group.items.forEach(item => {
+        if ((item.label+' '+(item.query||'')+' '+(item.url||'')).toLowerCase().includes(q.toLowerCase()))
+          results.push({group:group.group,item});
+      }));
       openDropdown(results);
     });
 
     inp.addEventListener('focus', () => {
-      // Show "my projects" + "popular sites" as default when focused with no query
       if (!inp.value.trim()) {
-        const defaults = allSuggestions
-          .filter(g => g.group === 'my projects' || g.group === 'popular sites')
-          .flatMap(g => g.items.map(item => ({ group: g.group, item })));
+        const defaults = allSuggestions.filter(g=>g.group==='my projects'||g.group==='popular sites').flatMap(g=>g.items.map(item=>({group:g.group,item})));
         openDropdown(defaults);
       }
     });
 
-    // Close when clicking outside
-    document.addEventListener('mousedown', e => {
-      if (!dropdown.contains(e.target) && e.target !== inp) closeDropdown();
-    });
+    document.addEventListener('mousedown', e => { if(!dropdown.contains(e.target)&&e.target!==inp) closeDropdown(); });
 
     // ── NEWS FEED ──
-    const TAG_CLASS = { update:'tag-update', news:'tag-news', release:'tag-release', blog:'tag-blog', dev:'tag-dev' };
+    const TAG_CLASS = {update:'tag-update',news:'tag-news',release:'tag-release',blog:'tag-blog',dev:'tag-dev'};
     function timeAgo(d) {
-      const ms = Date.now() - new Date(d).getTime();
-      const m = Math.floor(ms/6e4), h = Math.floor(ms/36e5), day = Math.floor(ms/864e5);
-      if (m < 60)  return m <= 1 ? 'just now' : `${m}m ago`;
-      if (h < 24)  return `${h}h ago`;
-      if (day < 30) return `${day}d ago`;
+      const ms=Date.now()-new Date(d).getTime(), m=Math.floor(ms/6e4), h=Math.floor(ms/36e5), day=Math.floor(ms/864e5);
+      if(m<60) return m<=1?'just now':`${m}m ago`;
+      if(h<24) return `${h}h ago`;
+      if(day<30) return `${day}d ago`;
       return new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
     }
     async function loadNews() {
       const grid = document.getElementById('news-grid');
       try {
         const res = await fetch('news.json');
-        if (!res.ok) throw 0;
-        const { items = [] } = await res.json();
-        if (!items.length) { grid.innerHTML = '<div class="news-error">No posts yet.</div>'; return; }
-        grid.innerHTML = items.map(item => {
-          const cls  = TAG_CLASS[item.tag] || 'tag-news';
-          const href = item.url ? `href="${item.url}"` : '';
-          const desc = item.description ? `<div class="news-item-desc">${item.description}</div>` : '';
-          const meta = item.date ? `<div class="news-item-meta">${timeAgo(item.date)}</div>` : '';
-          return `<a class="news-item" ${href}>
-            <span class="news-item-tag ${cls}">${item.tag||'news'}</span>
-            <div class="news-item-body">
-              <div class="news-item-title">${item.title}</div>${desc}${meta}
-            </div></a>`;
+        if(!res.ok) throw 0;
+        const {items=[]} = await res.json();
+        if(!items.length){grid.innerHTML='<div class="news-error">No posts yet.</div>';return;}
+        grid.innerHTML = items.map(item=>{
+          const cls=TAG_CLASS[item.tag]||'tag-news';
+          const href=item.url?`href="${item.url}"`:'';
+          const desc=item.description?`<div class="news-item-desc">${item.description}</div>`:'';
+          const meta=item.date?`<div class="news-item-meta">${timeAgo(item.date)}</div>`:'';
+          return `<a class="news-item" ${href}><span class="news-item-tag ${cls}">${item.tag||'news'}</span><div class="news-item-body"><div class="news-item-title">${item.title}</div>${desc}${meta}</div></a>`;
         }).join('');
         bindHover(grid);
-      } catch {
-        grid.innerHTML = `<div class="news-error">Add news.json to your repo to show posts here.</div>`;
-      }
+      } catch { grid.innerHTML=`<div class="news-error">Add news.json to your repo to show posts here.</div>`; }
     }
-    // ── HISTORY & COOKIES ──────────────────────────────────────────────────────
-    const COOKIE_KEY   = 'chinweb_history_consent';
-    const HISTORY_KEY  = 'chinweb_history';
-    const MAX_HISTORY  = 50;
 
-    // Cookie helpers (plain document.cookie, no expiry set = session; we set 1yr)
-    function setCookie(name, value, days = 365) {
-      const expires = new Date(Date.now() + days * 864e5).toUTCString();
-      document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires};path=/;SameSite=Lax`;
+    // ── CONSENT & COOKIES ─────────────────────────────────────────────────────
+    const CONSENT_KEY = 'chinweb_consent_v2';   // localStorage key for GCM state
+    const HISTORY_KEY = 'chinweb_history';       // cookie key for search history
+    const MAX_HISTORY = 50;
+    let historyEnabled = false;
+
+    // --- Cookie helpers ---
+    function setCookie(name, value, days=365) {
+      document.cookie = `${name}=${encodeURIComponent(value)};expires=${new Date(Date.now()+days*864e5).toUTCString()};path=/;SameSite=Lax`;
     }
     function getCookie(name) {
-      const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
-      return match ? decodeURIComponent(match[1]) : null;
+      const m = document.cookie.match(new RegExp('(?:^|; )'+name+'=([^;]*)'));
+      return m ? decodeURIComponent(m[1]) : null;
     }
     function deleteCookie(name) {
       document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
     }
 
-    // Consent state
-    let historyEnabled = getCookie(COOKIE_KEY) === 'true';
+    // --- Consent Mode v2 update ---
+    function applyGCM(allowAds, allowAnalytics) {
+      const state = {
+        ad_storage:              allowAds       ? 'granted' : 'denied',
+        ad_user_data:            allowAds       ? 'granted' : 'denied',
+        ad_personalization:      allowAds       ? 'granted' : 'denied',
+        analytics_storage:       allowAnalytics ? 'granted' : 'denied',
+        functionality_storage:   'granted',
+        personalization_storage: allowAnalytics ? 'granted' : 'denied',
+      };
+      gtag('consent', 'update', state);
+      try { localStorage.setItem(CONSENT_KEY, JSON.stringify(state)); } catch {}
+    }
 
-    function handleCookieChoice(allow) {
-      setCookie(COOKIE_KEY, allow ? 'true' : 'false');
-      historyEnabled = allow;
+    // --- Banner actions ---
+    function applyConsent(allowHistory, allowAds) {
+      historyEnabled = allowHistory;
+      document.getElementById('toggle-history').checked = allowHistory;
+      document.getElementById('toggle-ads').checked     = allowAds;
+      _finaliseConsent(allowHistory, allowAds);
+    }
+
+    function saveConsent() {
+      const allowHistory = document.getElementById('toggle-history').checked;
+      const allowAds     = document.getElementById('toggle-ads').checked;
+      _finaliseConsent(allowHistory, allowAds);
+    }
+
+    function _finaliseConsent(allowHistory, allowAds) {
+      historyEnabled = allowHistory;
+      if (!allowHistory) deleteCookie(HISTORY_KEY);
+      applyGCM(allowAds, allowHistory);
+      // Remember choice in localStorage so banner doesn't re-appear
+      try { localStorage.setItem('chinweb_consent_given', '1'); } catch {}
       document.getElementById('cookie-banner').classList.add('hidden');
       updateHistoryBtn();
-      if (!allow) {
-        deleteCookie(HISTORY_KEY);
-        document.getElementById('history-btn').classList.add('disabled');
-      }
     }
 
-    function showCookieBannerIfNeeded() {
-      const consent = getCookie(COOKIE_KEY);
-      if (consent === null) {
-        // First visit — show banner after a short delay
-        setTimeout(() => {
-          document.getElementById('cookie-banner').classList.remove('hidden');
-        }, 1200);
-      } else {
-        document.getElementById('cookie-banner').classList.add('hidden');
-      }
+    function reopenBanner() {
+      // Pre-fill toggles from current GCM state
+      try {
+        const saved = JSON.parse(localStorage.getItem(CONSENT_KEY) || 'null');
+        if (saved) {
+          document.getElementById('toggle-ads').checked     = saved.ad_storage === 'granted';
+          document.getElementById('toggle-history').checked = saved.analytics_storage === 'granted';
+        }
+      } catch {}
+      document.getElementById('cookie-banner').classList.remove('hidden');
     }
 
-    // History read/write (stored as JSON in a cookie)
+    function initConsent() {
+      try {
+        const given = localStorage.getItem('chinweb_consent_given');
+        if (!given) {
+          // First visit — show banner after delay
+          setTimeout(() => document.getElementById('cookie-banner').classList.remove('hidden'), 1000);
+        } else {
+          // Already consented — restore history state
+          const saved = JSON.parse(localStorage.getItem(CONSENT_KEY) || 'null');
+          if (saved) historyEnabled = saved.analytics_storage === 'granted';
+        }
+      } catch {
+        setTimeout(() => document.getElementById('cookie-banner').classList.remove('hidden'), 1000);
+      }
+      updateHistoryBtn();
+    }
+
+    // --- History ---
     function getHistory() {
       if (!historyEnabled) return [];
       try { return JSON.parse(getCookie(HISTORY_KEY) || '[]'); } catch { return []; }
@@ -1049,112 +905,59 @@
 
     function addToHistory(query) {
       if (!historyEnabled || !query.trim()) return;
-      let hist = getHistory();
-      // Remove duplicate if exists
-      hist = hist.filter(h => h.q.toLowerCase() !== query.toLowerCase());
-      hist.unshift({ q: query, t: Date.now() });
+      let hist = getHistory().filter(h => h.q.toLowerCase() !== query.toLowerCase());
+      hist.unshift({q: query, t: Date.now()});
       if (hist.length > MAX_HISTORY) hist = hist.slice(0, MAX_HISTORY);
       setCookie(HISTORY_KEY, JSON.stringify(hist));
       updateHistoryBtn();
     }
 
-    function clearHistory() {
-      deleteCookie(HISTORY_KEY);
-      updateHistoryBtn();
-      renderHistoryList();
-    }
+    function clearHistory() { deleteCookie(HISTORY_KEY); updateHistoryBtn(); renderHistoryList(); }
 
     function deleteHistoryItem(idx) {
-      let hist = getHistory();
-      hist.splice(idx, 1);
+      let hist = getHistory(); hist.splice(idx, 1);
       setCookie(HISTORY_KEY, JSON.stringify(hist));
-      updateHistoryBtn();
-      renderHistoryList();
+      updateHistoryBtn(); renderHistoryList();
     }
 
     function updateHistoryBtn() {
-      const btn   = document.getElementById('history-btn');
-      const hist  = getHistory();
-      const count = hist.length;
-      // Update badge
-      const existing = btn.querySelector('.count-badge');
-      if (existing) existing.remove();
-      if (historyEnabled && count > 0) {
+      const btn = document.getElementById('history-btn');
+      const hist = getHistory();
+      btn.querySelector('.count-badge')?.remove();
+      if (historyEnabled && hist.length) {
         const badge = document.createElement('span');
         badge.className = 'count-badge';
-        badge.textContent = count > 99 ? '99+' : count;
+        badge.textContent = hist.length > 99 ? '99+' : hist.length;
         btn.appendChild(badge);
-        btn.classList.remove('disabled');
       }
-      if (!historyEnabled) btn.classList.add('disabled');
-      else btn.classList.remove('disabled');
+      btn.classList.toggle('disabled', !historyEnabled);
     }
 
-    // Panel open/close
     function toggleHistory() {
       const panel   = document.getElementById('history-panel');
       const overlay = document.getElementById('history-overlay');
       const isOpen  = panel.classList.contains('open');
-      if (isOpen) {
-        panel.classList.remove('open');
-        overlay.classList.remove('open');
-      } else {
-        renderHistoryList();
-        panel.classList.add('open');
-        overlay.classList.add('open');
-      }
+      if (isOpen) { panel.classList.remove('open'); overlay.classList.remove('open'); }
+      else { renderHistoryList(); panel.classList.add('open'); overlay.classList.add('open'); }
     }
 
     function renderHistoryList() {
       const list = document.getElementById('history-list');
       if (!historyEnabled) {
-        list.innerHTML = `
-          <div class="history-disabled-msg">
-            History is disabled. Allow cookies to start saving your searches.
-            <br>
-            <button class="history-enable-btn" onclick="handleCookieChoice(true);renderHistoryList();">Enable history</button>
-          </div>`;
+        list.innerHTML = `<div class="history-disabled-msg">History is disabled.<br><button class="history-enable-btn" onclick="reopenBanner();toggleHistory();">Manage cookie settings</button></div>`;
         return;
       }
       const hist = getHistory();
-      if (!hist.length) {
-        list.innerHTML = `
-          <div class="history-empty">
-            <div class="history-empty-icon">🕐</div>
-            Your searches will appear here.
-          </div>`;
-        return;
-      }
-      list.innerHTML = hist.map((item, i) => `
+      if (!hist.length) { list.innerHTML = `<div class="history-empty"><div class="history-empty-icon">🕐</div>Your searches will appear here.</div>`; return; }
+      list.innerHTML = hist.map((item,i) => `
         <div class="history-item" onclick="setQuery(${JSON.stringify(item.q)});doSearch();toggleHistory();">
-          <svg class="history-item-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-          </svg>
+          <svg class="history-item-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
           <span class="history-item-text">${esc(item.q)}</span>
           <span class="history-item-time">${timeAgo(item.t)}</span>
           <button class="history-item-del" title="Remove" onclick="event.stopPropagation();deleteHistoryItem(${i});">✕</button>
         </div>`).join('');
       bindHover(list);
     }
-
-    // Hook into doSearch to save history
-    const _origDoSearch = doSearch;
-    // We patch addToHistory into fetchResults instead, after we know query is valid
-    const _origFetchResults = fetchResults;
-    // Override: save to history when a real search fires
-    (function() {
-      const origDoSearch = doSearch;
-      window.doSearch = function(page = 0) {
-        const q = inp.value.trim();
-        if (q) addToHistory(q);
-        origDoSearch(page);
-      };
-    })();
-
-    // Init
-    showCookieBannerIfNeeded();
-    updateHistoryBtn();
-    bindHover(document.getElementById('history-panel'));
   </script>
 </body>
 </html>
