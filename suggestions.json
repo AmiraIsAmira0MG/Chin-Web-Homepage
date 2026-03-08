@@ -1,0 +1,53 @@
+{
+  "_comment": "chinweb suggestions — shown as autocomplete/quick-access chips on the search page. Edit freely and push to GitHub.",
+  "suggestions": [
+    {
+      "group": "my projects",
+      "items": [
+        { "label": "chinberclart.dev",  "url": "https://chinberclart.dev",    "icon": "✦" },
+        { "label": "chin web",          "url": "chinweb.html",                "icon": "🔍" },
+        { "label": "btfly.social",      "url": "https://btfly.social",        "icon": "🦋" },
+        { "label": "cloudlight.games",  "url": "https://cloudlight.games",    "icon": "☁️" }
+      ]
+    },
+    {
+      "group": "popular sites",
+      "items": [
+        { "label": "YouTube",    "url": "https://youtube.com",    "icon": "▶️" },
+        { "label": "GitHub",     "url": "https://github.com",     "icon": "🐙" },
+        { "label": "Reddit",     "url": "https://reddit.com",     "icon": "👾" },
+        { "label": "Wikipedia",  "url": "https://wikipedia.org",  "icon": "📖" },
+        { "label": "Twitch",     "url": "https://twitch.tv",      "icon": "💜" },
+        { "label": "X",          "url": "https://x.com",          "icon": "✕" },
+        { "label": "Instagram",  "url": "https://instagram.com",  "icon": "📷" },
+        { "label": "Facebook",   "url": "https://facebook.com",   "icon": "🔵" },
+        { "label": "TikTok",     "url": "https://tiktok.com",     "icon": "🎵" },
+        { "label": "Discord",    "url": "https://discord.com",    "icon": "🎮" },
+        { "label": "Spotify",    "url": "https://spotify.com",    "icon": "🎧" },
+        { "label": "Netflix",    "url": "https://netflix.com",    "icon": "🎬" }
+      ]
+    },
+    {
+      "group": "dev tools",
+      "items": [
+        { "label": "MDN Web Docs",      "url": "https://developer.mozilla.org", "icon": "📚" },
+        { "label": "Stack Overflow",    "url": "https://stackoverflow.com",     "icon": "🧩" },
+        { "label": "Cloudflare",        "url": "https://cloudflare.com",        "icon": "🌥️" },
+        { "label": "Vercel",            "url": "https://vercel.com",            "icon": "▲" },
+        { "label": "CodePen",           "url": "https://codepen.io",            "icon": "✏️" },
+        { "label": "Can I Use",         "url": "https://caniuse.com",           "icon": "🔎" },
+        { "label": "npm",               "url": "https://npmjs.com",             "icon": "📦" }
+      ]
+    },
+    {
+      "group": "search",
+      "items": [
+        { "label": "latest news",             "query": "latest news",             "icon": "📰" },
+        { "label": "open source projects",    "query": "open source projects",    "icon": "⚙️" },
+        { "label": "game development",        "query": "game development",        "icon": "🎮" },
+        { "label": "indie dev",               "query": "indie dev community",     "icon": "🛠️" },
+        { "label": "web design inspiration",  "query": "web design inspiration",  "icon": "✦"  }
+      ]
+    }
+  ]
+}
