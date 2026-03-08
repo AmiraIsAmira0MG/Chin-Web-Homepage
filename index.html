@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>chin web — search the web</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0a0a0f;
+      --surface:  #111118;
+      --surface2: #18181f;
+      --border:   rgba(255,255,255,0.07);
+      --border2:  rgba(255,255,255,0.12);
+      --accent-a: #a9ffcb;
+      --accent-b: #ff6db1;
+      --text:     #f0f0f5;
+      --muted:    rgba(240,240,245,0.45);
+      --muted2:   rgba(240,240,245,0.7);
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+      cursor: none;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── CURSOR ── */
+    .cursor {
+      position: fixed; width: 12px; height: 12px;
+      background: var(--accent-a); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.18s, height 0.18s, background 0.2s, opacity 0.2s;
+    }
+    .cursor.big { width: 44px; height: 44px; background: rgba(169,255,203,0.12); border: 1.5px solid var(--accent-a); }
+    .cursor.text { width: 3px; height: 22px; border-radius: 2px; background: var(--accent-a); }
+    @media (max-width: 768px) { .cursor { display: none; } body { cursor: auto; } }
+
+    /* ── GLOW BG ── */
+    .bg-glow { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .bg-glow::before {
+      content: ''; position: absolute; top: -10%; left: 10%;
+      width: 700px; height: 700px;
+      background: radial-gradient(circle, rgba(169,255,203,0.065) 0%, transparent 70%);
+      animation: drift 16s ease-in-out infinite alternate;
+    }
+    .bg-glow::after {
+      content: ''; position: absolute; bottom: 5%; right: 5%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(255,109,177,0.055) 0%, transparent 70%);
+      animation: drift 22s ease-in-out infinite alternate-reverse;
+    }
+    @keyframes drift { from { transform: translate(0,0); } to { transform: translate(40px,30px); } }
+
+    /* ── MAIN LAYOUT ── */
+    main {
+      position: relative; z-index: 1;
+      flex: 1;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 2rem;
+      transition: justify-content 0.5s ease, padding-top 0.5s ease;
+    }
+    main.has-results {
+      justify-content: flex-start;
+      padding-top: 2rem;
+    }
+
+    /* ── LOGO AREA ── */
+    .logo-area {
+      text-align: center;
+      margin-bottom: 2.8rem;
+      transition: all 0.45s cubic-bezier(0.4,0,0.2,1);
+      animation: fadeUp 0.5s ease both;
+    }
+    main.has-results .logo-area {
+      display: none;
+    }
+    .logo-wordmark {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: clamp(2.8rem, 8vw, 5.5rem);
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 0.6rem;
+    }
+    .logo-wordmark .grad {
+      background: linear-gradient(135deg, var(--accent-a) 0%, var(--accent-b) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .logo-sub {
+      font-size: 0.72rem; font-weight: 500;
+      color: var(--muted); letter-spacing: 0.18em; text-transform: uppercase;
+      display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+    }
+    .logo-sub::before, .logo-sub::after {
+      content: ''; display: block; width: 20px; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--muted));
+    }
+    .logo-sub::after { background: linear-gradient(90deg, var(--muted), transparent); }
+
+    /* ── COMPACT HEADER (results state) ── */
+    .compact-header {
+      display: none;
+      align-items: center; gap: 1.4rem;
+      width: 100%; max-width: 780px;
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.3s ease both;
+    }
+    main.has-results .compact-header { display: flex; }
+    .compact-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800; font-size: 1.2rem;
+      letter-spacing: -0.03em; white-space: nowrap;
+      text-decoration: none; color: var(--text);
+      flex-shrink: 0;
+    }
+    .compact-logo .grad {
+      background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* ── SEARCH BOX ── */
+    .search-wrap {
+      width: 100%; max-width: 640px;
+      animation: fadeUp 0.5s 0.1s ease both;
+      transition: max-width 0.45s cubic-bezier(0.4,0,0.2,1);
+    }
+    main.has-results .search-wrap {
+      max-width: 780px;
+    }
+    .search-box {
+      display: flex; align-items: center;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 100px;
+      padding: 0.6rem 0.6rem 0.6rem 1.6rem;
+      gap: 0.8rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      position: relative;
+    }
+    .search-box:focus-within {
+      border-color: rgba(169,255,203,0.35);
+      box-shadow: 0 0 0 3px rgba(169,255,203,0.07), 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .search-icon {
+      flex-shrink: 0; opacity: 0.4;
+      transition: opacity 0.2s;
+    }
+    .search-box:focus-within .search-icon { opacity: 0.8; }
+    .search-input {
+      flex: 1; background: none; border: none; outline: none;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem; font-weight: 400;
+      color: var(--text);
+      cursor: none;
+    }
+    .search-input::placeholder { color: var(--muted); }
+    .search-btn {
+      background: linear-gradient(135deg, var(--accent-a), var(--accent-b));
+      color: #0a0a0f;
+      border: none; outline: none;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.8rem; font-weight: 700;
+      padding: 0.65rem 1.4rem;
+      border-radius: 100px;
+      cursor: none;
+      white-space: nowrap;
+      transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: 0.02em;
+    }
+    .search-btn:hover { opacity: 0.88; transform: scale(0.98); }
+    .search-btn:active { transform: scale(0.95); }
+
+    /* ── SHORTCUTS (home only) ── */
+    .shortcuts {
+      margin-top: 2.2rem;
+      display: flex; gap: 0.6rem; flex-wrap: wrap; justify-content: center;
+      animation: fadeUp 0.5s 0.2s ease both;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    main.has-results .shortcuts { display: none; }
+    .shortcut-chip {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 0.35rem 0.9rem;
+      font-size: 0.72rem; font-weight: 500;
+      color: var(--muted2);
+      cursor: none;
+      transition: border-color 0.2s, color 0.2s, background 0.2s;
+      text-decoration: none;
+    }
+    .shortcut-chip:hover {
+      border-color: rgba(169,255,203,0.3);
+      color: var(--accent-a);
+      background: rgba(169,255,203,0.05);
+    }
+
+    /* ── ECOSIA BADGE (home only) ── */
+    .ecosia-badge {
+      margin-top: 3rem;
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      font-size: 0.65rem; font-weight: 500;
+      color: var(--muted); letter-spacing: 0.06em;
+      animation: fadeUp 0.5s 0.3s ease both;
+    }
+    main.has-results .ecosia-badge { display: none; }
+    .ecosia-dot { width: 6px; height: 6px; border-radius: 50%; background: #6dbf6d; }
+
+    /* ── RESULTS AREA ── */
+    .results-area {
+      width: 100%; max-width: 780px;
+      display: none;
+      animation: fadeUp 0.35s ease both;
+    }
+    main.has-results .results-area { display: block; }
+
+    .results-meta {
+      font-size: 0.72rem; color: var(--muted);
+      margin-bottom: 1.8rem; padding-left: 0.2rem;
+      display: flex; align-items: center; gap: 0.6rem;
+    }
+    .results-meta-sep { width: 3px; height: 3px; border-radius: 50%; background: var(--muted); }
+
+    /* ── RESULT CARDS ── */
+    .result-card {
+      margin-bottom: 1.6rem;
+      padding: 1.4rem 1.6rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      transition: border-color 0.2s, transform 0.15s;
+      cursor: none;
+      position: relative; overflow: hidden;
+    }
+    .result-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(169,255,203,0), transparent);
+      transition: background 0.3s;
+    }
+    .result-card:hover {
+      border-color: rgba(169,255,203,0.2);
+      transform: translateY(-1px);
+    }
+    .result-card:hover::before {
+      background: linear-gradient(90deg, transparent, rgba(169,255,203,0.3), transparent);
+    }
+    .result-url {
+      display: flex; align-items: center; gap: 0.5rem;
+      font-size: 0.7rem; color: var(--muted);
+      margin-bottom: 0.45rem;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .result-favicon {
+      width: 14px; height: 14px; border-radius: 3px;
+      background: var(--surface2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8px; overflow: hidden; flex-shrink: 0;
+    }
+    .result-favicon img { width: 100%; height: 100%; object-fit: cover; }
+    .result-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 1rem;
+      line-height: 1.3; margin-bottom: 0.5rem;
+      color: var(--text);
+      text-decoration: none; display: block;
+    }
+    .result-title:hover { color: var(--accent-a); }
+    .result-snippet {
+      font-size: 0.82rem; font-weight: 300;
+      line-height: 1.65; color: var(--muted2);
+    }
+
+    /* ── LOADING STATE ── */
+    .loading-state {
+      display: none;
+      flex-direction: column; align-items: center; gap: 1.2rem;
+      padding: 4rem 0;
+      width: 100%; max-width: 780px;
+    }
+    main.is-loading .loading-state { display: flex; }
+    main.is-loading .results-area { display: none; }
+    .loading-bar {
+      width: 200px; height: 2px;
+      background: var(--surface2);
+      border-radius: 2px; overflow: hidden;
+    }
+    .loading-bar-inner {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent-a), var(--accent-b));
+      border-radius: 2px;
+      animation: load 1.4s ease-in-out infinite;
+    }
+    @keyframes load { 0% { width: 0%; margin-left: 0%; } 50% { width: 60%; margin-left: 20%; } 100% { width: 0%; margin-left: 100%; } }
+    .loading-label { font-size: 0.7rem; color: var(--muted); letter-spacing: 0.12em; text-transform: uppercase; font-family: 'Syne', sans-serif; font-weight: 700; }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1;
+      border-top: 1px solid var(--border);
+      padding: 1.2rem 2rem;
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 0.8rem;
+      font-size: 0.68rem; color: var(--muted);
+    }
+    footer a { color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    footer a:hover { color: var(--accent-a); }
+    .footer-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 0.82rem; letter-spacing: -0.02em; }
+    .footer-links { display: flex; gap: 1.2rem; }
+    .footer-eco { display: flex; align-items: center; gap: 0.4rem; }
+    .eco-dot { width: 5px; height: 5px; border-radius: 50%; background: #6dbf6d; }
+
+    /* ── NEWS FEED ── */
+    .news-section {
+      width: 100%; max-width: 640px;
+      margin-top: 3.5rem;
+      animation: fadeUp 0.5s 0.35s ease both;
+    }
+    main.has-results .news-section { display: none; }
+
+    .news-header {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 1.2rem;
+    }
+    .news-header-line { flex: 1; height: 1px; background: var(--border); }
+    .news-header-label {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.62rem; font-weight: 700;
+      letter-spacing: 0.2em; text-transform: uppercase;
+      color: var(--muted); white-space: nowrap;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .news-live-dot {
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--accent-a);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+    .news-grid {
+      display: flex; flex-direction: column; gap: 1px;
+      border-radius: 16px; overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .news-item {
+      background: var(--surface);
+      padding: 1.1rem 1.4rem;
+      display: flex; gap: 1rem; align-items: flex-start;
+      text-decoration: none; color: inherit;
+      transition: background 0.2s;
+      cursor: none;
+    }
+    .news-item:hover { background: var(--surface2); }
+    .news-item:hover .news-item-title { color: var(--accent-a); }
+    .news-item-tag {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.55rem; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      padding: 0.2rem 0.55rem; border-radius: 100px;
+      border: 1px solid; white-space: nowrap;
+      flex-shrink: 0; align-self: flex-start; margin-top: 0.15rem;
+    }
+    .news-item-tag.tag-update  { color: var(--accent-a); border-color: rgba(169,255,203,0.3); background: rgba(169,255,203,0.07); }
+    .news-item-tag.tag-news    { color: var(--accent-b); border-color: rgba(255,109,177,0.3);  background: rgba(255,109,177,0.07); }
+    .news-item-tag.tag-release { color: #ffd97a;         border-color: rgba(255,217,122,0.3);  background: rgba(255,217,122,0.07); }
+    .news-item-tag.tag-blog    { color: #82aaff;         border-color: rgba(130,170,255,0.3);  background: rgba(130,170,255,0.07); }
+    .news-item-tag.tag-dev     { color: #b48eff;         border-color: rgba(180,142,255,0.3);  background: rgba(180,142,255,0.07); }
+    .news-item-body { flex: 1; min-width: 0; }
+    .news-item-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 0.88rem;
+      line-height: 1.35; color: var(--text);
+      transition: color 0.2s; margin-bottom: 0.25rem;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .news-item-desc {
+      font-size: 0.75rem; font-weight: 300;
+      color: var(--muted2); line-height: 1.55;
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+    }
+    .news-item-meta {
+      font-size: 0.65rem; color: var(--muted);
+      margin-top: 0.4rem;
+      font-family: 'Syne', sans-serif; font-weight: 600; letter-spacing: 0.06em;
+    }
+    .news-error {
+      text-align: center; padding: 2rem;
+      font-size: 0.78rem; color: var(--muted);
+      background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    }
+    .news-loading {
+      display: flex; justify-content: center; align-items: center;
+      gap: 0.5rem; padding: 2rem;
+      font-size: 0.72rem; color: var(--muted);
+      font-family: 'Syne', sans-serif; font-weight: 700;
+      letter-spacing: 0.12em; text-transform: uppercase;
+    }
+    .news-spinner {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid var(--border2); border-top-color: var(--accent-a);
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      .search-btn span { display: none; }
+      .search-btn::after { content: '→'; }
+      .logo-wordmark { font-size: 3rem; }
+      footer { justify-content: center; text-align: center; }
+      .footer-links { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="bg-glow"></div>
+
+  <main id="main">
+
+    <!-- HOME: Logo -->
+    <div class="logo-area">
+      <div class="logo-wordmark">chin<span class="grad">web</span></div>
+      <div class="logo-sub">search the web</div>
+    </div>
+
+    <!-- RESULTS: Compact header -->
+    <div class="compact-header">
+      <a href="chinweb.html" class="compact-logo">chin<span class="grad">web</span></a>
+    </div>
+
+    <!-- Search box -->
+    <div class="search-wrap" id="search-wrap">
+      <div class="search-box">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input
+          type="text"
+          class="search-input"
+          id="search-input"
+          placeholder="Search the web..."
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="search-btn" id="search-btn" onclick="doSearch()">
+          <span>Search</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Quick shortcuts -->
+    <div class="shortcuts">
+      <a class="shortcut-chip" href="#" onclick="setQuery('latest news');doSearch();return false;">📰 News</a>
+      <a class="shortcut-chip" href="#" onclick="setQuery('open source projects');doSearch();return false;">⚙️ Open Source</a>
+      <a class="shortcut-chip" href="#" onclick="setQuery('game development tutorials');doSearch();return false;">🎮 Game Dev</a>
+      <a class="shortcut-chip" href="#" onclick="setQuery('indie dev community');doSearch();return false;">🛠️ Indie Dev</a>
+      <a class="shortcut-chip" href="#" onclick="setQuery('web design inspiration');doSearch();return false;">✦ Design</a>
+    </div>
+
+    <!-- Ecosia credit badge -->
+    <div class="ecosia-badge">
+      <span class="ecosia-dot"></span>
+      Search results powered by Ecosia · trees planted with every search
+    </div>
+
+    <!-- News Feed -->
+    <div class="news-section" id="news-section">
+      <div class="news-header">
+        <div class="news-header-line"></div>
+        <div class="news-header-label">
+          <span class="news-live-dot"></span>
+          From the desk
+        </div>
+        <div class="news-header-line"></div>
+      </div>
+      <div class="news-grid" id="news-grid">
+        <div class="news-loading">
+          <div class="news-spinner"></div>
+          Loading
+        </div>
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div class="loading-state">
+      <div class="loading-bar"><div class="loading-bar-inner"></div></div>
+      <div class="loading-label">Searching via Ecosia</div>
+    </div>
+
+    <!-- Results area -->
+    <div class="results-area" id="results-area">
+      <div class="results-meta" id="results-meta"></div>
+      <div id="results-list"></div>
+      <div id="results-cta" style="text-align:center;padding:1rem 0 2rem;display:none;">
+        <a id="ecosia-fulllink" href="#" target="_blank" rel="noopener"
+           style="display:inline-flex;align-items:center;gap:0.6rem;padding:0.7rem 1.6rem;background:var(--surface);border:1px solid var(--border2);border-radius:100px;font-size:0.8rem;font-weight:600;color:var(--muted2);text-decoration:none;transition:border-color 0.2s,color 0.2s;">
+          View all results on Ecosia →
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <footer>
+    <div class="footer-logo">chin<span style="background:linear-gradient(135deg,#a9ffcb,#ff6db1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">web</span></div>
+    <div class="footer-links">
+      <a href="index.html">chinberclart.dev</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="ai.html">AI Stance</a>
+    </div>
+    <div class="footer-eco">
+      <span class="eco-dot"></span>
+      <span>Powered by <a href="https://ecosia.org" target="_blank" rel="noopener">Ecosia</a></span>
+    </div>
+  </footer>
+
+  <script>
+    // ── CURSOR ──
+    const cursor = document.getElementById('cursor');
+    document.addEventListener('mousemove', e => {
+      cursor.style.left = e.clientX + 'px';
+      cursor.style.top  = e.clientY + 'px';
+    });
+    document.querySelectorAll('a, button, .shortcut-chip').forEach(el => {
+      el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+      el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+    });
+    const inp = document.getElementById('search-input');
+    inp.addEventListener('mouseenter', () => { cursor.classList.remove('big'); cursor.classList.add('text'); });
+    inp.addEventListener('mouseleave', () => cursor.classList.remove('text'));
+
+    // ── SEARCH ──
+    const main = document.getElementById('main');
+
+    function setQuery(q) {
+      document.getElementById('search-input').value = q;
+    }
+
+    function doSearch() {
+      const query = document.getElementById('search-input').value.trim();
+      if (!query) return;
+
+      // Push to URL
+      const url = new URL(window.location.href);
+      url.searchParams.set('q', query);
+      window.history.pushState({}, '', url);
+
+      // Show loading
+      main.classList.remove('has-results');
+      main.classList.add('has-results', 'is-loading');
+
+      // Ecosia embed via their search URL in an iframe we parse,
+      // OR — since Ecosia doesn't have a public JSON API —
+      // we redirect inline to Ecosia in an iframe and show a native results UI.
+      // Best UX: open Ecosia results in embedded iframe below, styled to match.
+      showEcosiaFrame(query);
+    }
+
+    function showEcosiaFrame(query) {
+      const ecosiaUrl = `https://www.ecosia.org/search?q=${encodeURIComponent(query)}`;
+
+      // Update the "view on Ecosia" link
+      document.getElementById('ecosia-fulllink').href = ecosiaUrl;
+      document.getElementById('ecosia-fulllink').style.display = 'inline-flex';
+
+      // Update meta
+      document.getElementById('results-meta').innerHTML =
+        `<span>Searching for <strong style="color:var(--text);">${escapeHtml(query)}</strong></span>
+         <span class="results-meta-sep"></span>
+         <span>via Ecosia</span>`;
+
+      // Build iframe
+      const resultsList = document.getElementById('results-list');
+      resultsList.innerHTML = '';
+
+      const frameWrap = document.createElement('div');
+      frameWrap.style.cssText = `
+        position: relative;
+        border-radius: 16px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        min-height: 600px;
+      `;
+
+      // Overlay bar to keep chinweb branding
+      const bar = document.createElement('div');
+      bar.style.cssText = `
+        position: absolute; top: 0; left: 0; right: 0;
+        height: 3px; z-index: 2;
+        background: linear-gradient(90deg, #a9ffcb, #ff6db1);
+        pointer-events: none;
+      `;
+
+      const iframe = document.createElement('iframe');
+      iframe.src = ecosiaUrl;
+      iframe.style.cssText = `
+        width: 100%;
+        min-height: 800px;
+        border: none;
+        display: block;
+        background: #fff;
+        border-radius: 0 0 16px 16px;
+      `;
+      iframe.title = `Ecosia search results for ${query}`;
+      iframe.setAttribute('loading', 'lazy');
+
+      iframe.addEventListener('load', () => {
+        main.classList.remove('is-loading');
+        document.getElementById('results-cta').style.display = 'block';
+      });
+
+      // Fallback if iframe blocked
+      iframe.addEventListener('error', () => {
+        showFallback(query, ecosiaUrl);
+      });
+
+      frameWrap.appendChild(bar);
+      frameWrap.appendChild(iframe);
+      resultsList.appendChild(frameWrap);
+
+      // Safety timeout fallback
+      setTimeout(() => {
+        if (main.classList.contains('is-loading')) {
+          main.classList.remove('is-loading');
+          document.getElementById('results-cta').style.display = 'block';
+        }
+      }, 5000);
+    }
+
+    function showFallback(query, ecosiaUrl) {
+      main.classList.remove('is-loading');
+      const resultsList = document.getElementById('results-list');
+      resultsList.innerHTML = `
+        <div style="padding:3rem;text-align:center;background:var(--surface);border:1px solid var(--border);border-radius:16px;">
+          <div style="font-size:2rem;margin-bottom:1rem;">🌱</div>
+          <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;margin-bottom:0.8rem;">Results ready on Ecosia</div>
+          <div style="font-size:0.85rem;color:var(--muted2);margin-bottom:1.8rem;max-width:40ch;margin-left:auto;margin-right:auto;line-height:1.7;">
+            Your browser blocked the inline frame. Click below to see your results — Ecosia will open in a new tab and plant trees while you search.
+          </div>
+          <a href="${ecosiaUrl}" target="_blank" rel="noopener"
+             style="display:inline-flex;align-items:center;gap:0.6rem;padding:0.75rem 1.8rem;background:linear-gradient(135deg,#a9ffcb,#ff6db1);color:#0a0a0f;border-radius:100px;font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:700;text-decoration:none;letter-spacing:0.02em;">
+            Search on Ecosia →
+          </a>
+        </div>
+      `;
+      document.getElementById('results-cta').style.display = 'none';
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    // ── KEYBOARD ──
+    inp.addEventListener('keydown', e => {
+      if (e.key === 'Enter') doSearch();
+      if (e.key === 'Escape') inp.blur();
+    });
+
+    // Focus search on '/' key
+    document.addEventListener('keydown', e => {
+      if (e.key === '/' && document.activeElement !== inp) {
+        e.preventDefault();
+        inp.focus();
+      }
+    });
+
+    // ── ON LOAD: check for ?q= ──
+    window.addEventListener('DOMContentLoaded', () => {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get('q');
+      if (q) {
+        inp.value = q;
+        doSearch();
+      }
+    });
+    // ── NEWS FEED ──
+    // Loads from news.json in the same directory (add/edit via GitHub)
+    const NEWS_JSON = 'news.json';
+    const TAG_CLASS = { update:'tag-update', news:'tag-news', release:'tag-release', blog:'tag-blog', dev:'tag-dev' };
+
+    function timeAgo(dateStr) {
+      const diff = Date.now() - new Date(dateStr).getTime();
+      const mins = Math.floor(diff / 60000);
+      const hrs  = Math.floor(diff / 3600000);
+      const days = Math.floor(diff / 86400000);
+      if (mins < 60)  return mins <= 1 ? 'just now' : `${mins}m ago`;
+      if (hrs  < 24)  return `${hrs}h ago`;
+      if (days < 30)  return `${days}d ago`;
+      return new Date(dateStr).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    }
+
+    async function loadNews() {
+      const grid = document.getElementById('news-grid');
+      try {
+        const res = await fetch(NEWS_JSON);
+        if (!res.ok) throw new Error('not found');
+        const data = await res.json();
+        const items = data.items || [];
+
+        if (!items.length) {
+          grid.innerHTML = '<div class="news-error">No posts yet.</div>';
+          return;
+        }
+
+        grid.innerHTML = items.map(item => {
+          const tagClass = TAG_CLASS[item.tag] || 'tag-news';
+          const href = item.url ? `href="${item.url}" target="_blank" rel="noopener"` : '';
+          const tag  = item.tag  || 'news';
+          const desc = item.description ? `<div class="news-item-desc">${item.description}</div>` : '';
+          const meta = item.date ? `<div class="news-item-meta">${timeAgo(item.date)}</div>` : '';
+          return `
+            <a class="news-item" ${href}>
+              <span class="news-item-tag ${tagClass}">${tag}</span>
+              <div class="news-item-body">
+                <div class="news-item-title">${item.title}</div>
+                ${desc}${meta}
+              </div>
+            </a>`;
+        }).join('');
+
+        // Re-bind cursor to new links
+        grid.querySelectorAll('a').forEach(el => {
+          el.addEventListener('mouseenter', () => cursor.classList.add('big'));
+          el.addEventListener('mouseleave', () => cursor.classList.remove('big'));
+        });
+
+      } catch (e) {
+        grid.innerHTML = `<div class="news-error">Couldn't load news.json — add it to your GitHub repo to show posts here.</div>`;
+      }
+    }
+
+    loadNews();
+  </script>
+</body>
+</html>
